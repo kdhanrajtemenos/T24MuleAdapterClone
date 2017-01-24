@@ -1,11 +1,13 @@
 package com.temenos.adapter.mule.T24inbound.connector.utils;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 import java.nio.file.Files;
@@ -14,6 +16,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.Properties;
+
+import org.mule.util.FileUtils;
+
+import com.temenos.adapter.mule.T24inbound.connector.metadata.extract.T24BaseInboundMetadataExctractor;
+import com.temenos.adapter.mule.T24inbound.connector.metadata.extract.T24BaseInboundMetadataExctractor;
+import com.temenos.adapter.mule.T24inbound.connector.utils.IoResourseUtil;
+import com.temenos.adapter.mule.T24inbound.connector.utils.PasswdUtil;
 
 public class IoResourseUtil {
 
@@ -38,30 +47,30 @@ public class IoResourseUtil {
 		InputStream is = null;
 		is =  this.getClass().getResourceAsStream(fName);
 		if(is != null) {
-			//System.out.println("this.getClass().getResourceAsStream(fName) WORKED! " + fName);
+			//System.out.println("Get metadata resourse (id=1) " + fName);
 			return is;
 		}
 		is =  Thread.currentThread().getContextClassLoader().getResourceAsStream(fName);
 		if(is != null) {
-			//System.out.println("Thread.currentThread().getContextClassLoader().getResourceAsStream(fName) WORKED! " + fName);
+			//System.out.println("Get metadata resourse (id=2) " + fName);
 			return is;
 		}
 		is =  IoResourseUtil.class.getResourceAsStream(fName);
 		if(is != null) {
-			//System.out.println("IoResourseUtil.class.getResourceAsStream(fName) WORKED! " + fName);
+			//System.out.println("Get metadata resourse (id=3) " + fName);
 			return is;
 		}
 		is =  IoResourseUtil.class.getClassLoader().getResourceAsStream(fName);
 		if(is != null) {
-			//System.out.println("IoResourseUtil.class.getClassLoader().getResourceAsStream(fName) WORKED! " + fName);
+			//System.out.println("Get metadata resourse (id=4) " + fName);
 			return is;
 		}
 		is =  this.getClass().getClassLoader().getResourceAsStream(fName);
 		if(is != null) {
-			//System.out.println("this.getClass().getClassLoader().getResourceAsStream(fName) WORKED! " + fName);
+			//System.out.println("Get metadata resourse (id=5) " + fName);
 			return is;
 		}
-		System.out.println("NONE OF THEM WORKED FOR: " + fName);
+		//System.out.println("NONE OF THEM WORKED FOR: " + fName);
 		return null;
 	}
 	
@@ -70,19 +79,23 @@ public class IoResourseUtil {
 		InputStream is = null;
 		try{
 			if(path.equals(SHEMA_DIR)){
-				is =   new FileInputStream(path+BASE_DIR+resourseFile); 
+				is =   new FileInputStream(path+File.separatorChar+resourseFile); 
 			}else{
 				
-				String alterbateDir = path.substring(path.lastIndexOf("\\")+1);
-				String possibleFilePaths [] = {resourseFile,"/"+resourseFile, path+resourseFile, alterbateDir+resourseFile};
+				String alterbateDir = path.substring(path.lastIndexOf(File.separatorChar)+1);
+				String possibleFilePaths [] = {resourseFile, File.separatorChar + resourseFile , File.separatorChar  + T24BaseInboundMetadataExctractor.INPUT_SCHEMA_FOLDER_NAME + "/" + resourseFile, File.separatorChar +  T24BaseInboundMetadataExctractor.OUTPUT_SCHEMA_FOLDER_NAME  + "/" + resourseFile, File.separatorChar +  T24BaseInboundMetadataExctractor.METADATA_FOLDER_NAME +"/"+resourseFile ,"/"+resourseFile, path+resourseFile, alterbateDir+resourseFile};
 				for(String fpath : possibleFilePaths){
+					
 					is = tryInStreams(fpath);
-					if(is!=null) break;
+					if(is!=null) {
+						System.out.println("Get resource: " + fpath);
+						break;
+					}
 				}
-				String fullPath = path+resourseFile; //D:\TestOut\Credentials.txt 
-				//is =  this.getClass().getResourceAsStream(fullPath); 
+				String fullPath = path+resourseFile;
 				if(is==null){
 					 is = new FileInputStream(fullPath); 
+					 System.out.println("Get resourse (absolute path) " + fullPath);
 					 
 				}
 			}
@@ -102,6 +115,14 @@ public class IoResourseUtil {
 		  Path file = dir.toPath();
 		  if (file == null || !Files.exists(file)) return false;
 		  else return Files.isDirectory(file);
+	}
+	
+	public static boolean isFile(String filePath){
+		if(filePath == null || filePath.isEmpty()) return false;
+		File dir = new File(filePath);
+		Path file = dir.toPath();
+		if (file == null || !Files.exists(file)) return false;
+		return true;
 	}
 	
 	public static boolean isDirSyntaxCorrect(String path) {
@@ -134,7 +155,7 @@ public class IoResourseUtil {
 			throw new RuntimeException("Incorrect recourse type");
 		}
 		if(location==null || location.isEmpty()) {
-			location = BASE_DIR;
+			location = File.separator;
 		}
 		Properties prop = new Properties();
 		InputStream fis = readConfigarableResourse(location, filename);
@@ -164,6 +185,59 @@ public class IoResourseUtil {
 			throw new RuntimeException("Cannot find resourse");
 		}
 		return prop;
+	}
+	
+	/**
+	 * Reads a file content as String
+	 * @param filename
+	 * @param resourseType
+	 * @return Properties
+	 * @throws RuntimeException
+	 */
+	public String readSchemaFile(String filename, String location)  throws RuntimeException {
+
+
+		if(filename.isEmpty()){
+			throw new RuntimeException("Incorrect schema file");
+		}
+		if(location==null || location.isEmpty()) {
+			location = File.separator;
+		}
+
+		InputStream fis = readConfigarableResourse(location, filename);
+		if(fis != null){
+			BufferedReader br = null;
+			StringBuilder sb = new StringBuilder();
+	
+			String line;
+			try {
+	
+				br = new BufferedReader(new InputStreamReader(fis));
+				while ((line = br.readLine()) != null) {
+					sb.append(line);
+				}
+	
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				if (br != null) {
+					try {
+						br.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			try {
+				fis.close();
+			} catch (IOException e) {
+				throw new RuntimeException("schema resourse load failed!");
+			}
+			return sb.toString();
+		}else{
+			throw new RuntimeException("Cannot load schema resourse!");
+		}
+		
 	}
 	
 
@@ -225,8 +299,9 @@ public class IoResourseUtil {
 	public boolean writePropertiesToFile(Properties prop, String directory ,String filename){
 		OutputStream  fos= null;
 		try{
+
 			File f = null; 
-			f= new File(directory, filename);
+			f= new File(directory+File.separatorChar+ filename); ///src/main/api/ , paswor
 			fos = new FileOutputStream(f);
 			prop.store(fos, null);
 		}catch (FileNotFoundException e) {
@@ -242,9 +317,31 @@ public class IoResourseUtil {
 					return false;
 				}
 			}else{
-				System.out.println("Can't resolve schema directory for writing");	
+				System.out.println("Can't resolve schema directory for writing");
+				return false;
 			}
 		}
 		return true;
+	}
+	
+	public void writeSchemas(String filePath, String content) throws IOException {
+		FileUtils.writeStringToFile(new File(filePath), content);
+	}
+	
+	public String createDirectory(String directory, String folder){
+		if(directory == null || directory.isEmpty()) {
+			return null;
+		}
+		
+		String fullFolder = directory;
+		if(!folder.isEmpty()){
+			fullFolder +=  File.separatorChar + folder;
+		}
+		
+		File dir = new File(fullFolder);
+		if (! dir.exists()){
+			dir.mkdir();
+		}
+		return fullFolder;
 	}
 }

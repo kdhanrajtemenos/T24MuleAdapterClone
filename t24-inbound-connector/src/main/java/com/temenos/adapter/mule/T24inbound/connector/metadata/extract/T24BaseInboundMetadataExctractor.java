@@ -30,8 +30,16 @@ public class T24BaseInboundMetadataExctractor {
 	public static final String SERVICE_OPERATION_TARGET_KEY = "serviceOperationTarget";
 	public static final String SERVICE_OPERATION_NAME_KEY = "serviceOperationName";
 	
+	public static final String METADATA_FOLDER_NAME = "Metadata";
+	public static final String INPUT_SCHEMA_FOLDER_NAME = "Input";
+	public static final String OUTPUT_SCHEMA_FOLDER_NAME = "Output";
+	
+	public static final String INPUT_FILE_SHEMA_PREFIX = "In ";
+	public static final String OUTPUT_FILE_SHEMA_PREFIX = "Out ";
+	
 	/* Property file extension */
-	public static final String SCHEMA_FILE_EXT = ".md";
+	public static final String METADATA_FILE_EXT = ".md";
+	public static final String SCHEMA_FILE_EXT = ".xsd";
 	
 	/* T24 metadata discovery API*/
 	private T24InboundAPICall inboundCall;

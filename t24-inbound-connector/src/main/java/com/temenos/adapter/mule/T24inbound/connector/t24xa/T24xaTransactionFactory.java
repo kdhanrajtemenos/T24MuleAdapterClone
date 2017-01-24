@@ -32,7 +32,7 @@ public class T24xaTransactionFactory implements UniversalTransactionFactory  {
     	tx.begin();
     	tx.bindResource(T24xaUtils.TRANSACTION_RSOURSE_TYPE, resource);
     	
-    	
+    
     	List<T24Event> result  = tx.execute(resource);
     	return result;
     }

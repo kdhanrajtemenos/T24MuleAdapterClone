@@ -1,5 +1,7 @@
 package com.temenos.adapter.mule.T24inbound.connector.metadata.extract;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -124,37 +126,40 @@ public class T24InboundDesignTimeMetaDataExtractor extends T24BaseInboundMetadat
 	 */
 	public void saveSchemaFiles(String directory){
 		IoResourseUtil ioProcessor = new IoResourseUtil();
+		
+		File file = new File(directory);
+        String extractedDir = directory;
+
+        if (file.isFile()) {
+            extractedDir = file.getParent(); // fix removing file name before extractions and save of files
+        }
+		
+		String fullPath = ioProcessor.createDirectory(extractedDir, ""); 
+		
+		String metadataRequestFolder = ioProcessor.createDirectory(fullPath, METADATA_FOLDER_NAME); // Metadata
+
+		String outSchemaFolder = ioProcessor.createDirectory(fullPath, OUTPUT_SCHEMA_FOLDER_NAME); // Output
+
+		
 		for(InboundMetadataModel model : this.getOnlySelectable()){
-			String fileName = model.getName().trim()+SCHEMA_FILE_EXT;
-			
 			String requestName = model.getName();
 			Properties prop = new Properties();
 			prop.put(ROOT_NAME_REQUEST_KEY, requestName);
-			/*
-			String responseName = model.getRootNameResponse();
-			String inSchemaEnc = model.getInputSchemas();
-			String outSchemaEnc = model.getOutputSchemas();
 			
-			String action = model.getOperation().getAction();
-			String tasget = model.getOperation().getTarget();
-			String name = model.getOperation().getName();
+			String schema = model.getMasterSchema().getContent();
+
+			String fileName = requestName + METADATA_FILE_EXT;
 			
-			Properties prop = new Properties();
-			
-			prop.put(ROOT_NAME_REQUEST_KEY, requestName);
-			prop.put(ROOT_NAME_RESPONSE_KEY, responseName);
-			prop.put(INPUT_SCHEMA_KEY, inSchemaEnc);
-			prop.put(OUTPUT_SCHEMA_KEY, outSchemaEnc);
-			prop.put(SERVICE_OPERATION_ACTION_KEY, action);
-			prop.put(SERVICE_OPERATION_TARGET_KEY, tasget);
-			prop.put(SERVICE_OPERATION_NAME_KEY, name);
-			*/
-			if(directory==null || directory.isEmpty()){
-				ioProcessor.writePropertiesToFile(prop, IoResourseUtil.SHEMA_DIR, fileName);
-			}else{
-				ioProcessor.writePropertiesToFile(prop, directory, fileName);
+			String outSchemaFile = outSchemaFolder + File.separatorChar + OUTPUT_FILE_SHEMA_PREFIX + model.getName() + SCHEMA_FILE_EXT;
+				
+			try {
+				ioProcessor.writePropertiesToFile(prop, metadataRequestFolder, fileName);
+				ioProcessor.writeSchemas(outSchemaFile, schema);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
+			
 		}
 	}
-
+	
 }

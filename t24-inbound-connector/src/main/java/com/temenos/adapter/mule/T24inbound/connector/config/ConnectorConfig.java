@@ -1,5 +1,7 @@
 package com.temenos.adapter.mule.T24inbound.connector.config;
 
+import java.util.Properties;
+
 //import javax.transaction.TransactionManager;
 
 import org.apache.commons.lang3.StringUtils;
@@ -10,10 +12,12 @@ import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Connect;
 import org.mule.api.annotations.ConnectionIdentifier;
 import org.mule.api.annotations.Disconnect;
+import org.mule.api.annotations.Required;
 import org.mule.api.annotations.TestConnectivity;
 import org.mule.api.annotations.ValidateConnection;
 import org.mule.api.annotations.components.ConnectionManagement;
 import org.mule.api.annotations.display.FriendlyName;
+import org.mule.api.annotations.display.Password;
 import org.mule.api.annotations.display.Path;
 import org.mule.api.annotations.display.Placement;
 import org.mule.api.annotations.display.Summary;
@@ -222,6 +226,26 @@ public class ConnectorConfig {
 	}
 	
 	
+	public String servicePassword;
+	
+
+	public String getServicePassword() {
+		return servicePassword;
+	}
+
+	public void setServicePassword(String servicePassword) {
+		this.servicePassword = servicePassword;
+	}
+	
+	/** 
+	 * Sets a text filed in the design-time connector configuration window
+	 * for inputting the T24 Runtime password
+	 * */
+	@Configurable
+	@Password
+	@Default(value = "123456")
+	@Placement(order = 4, group = "Connector Runtime Configuration", tab = "Runtime")
+	@FriendlyName("T24 password")
 	private String t24password;
 	
 	public String getT24password() {
@@ -234,16 +258,22 @@ public class ConnectorConfig {
 	
 
 	@TestConnectivity(label="WebService test")
-	public void testConnect(@ConnectionKey String username, @Optional @Default("http://localhost:9089/axis2/services") String serviceUrl, @Optional @Default("GB0010001") String coCode, @Path @Optional @Default("D:/Schemas") String folder) throws ConnectionException{
+	public void testConnect(@ConnectionKey String username, @Password String password
+			, @Optional @Default("http://localhost:9089/axis2/services") String serviceUrl
+			, @Optional @Default("GB0010001") String coCode
+			, @Path @Optional @Default("D:/Schemas") String emptyCredentialFile) throws ConnectionException{
 
-		if(!verifyUserInput(username,  serviceUrl, folder, coCode)){
+		if(!verifyUserInput(username,  serviceUrl, emptyCredentialFile, coCode)){
 			throw new ConnectionException(ConnectionExceptionCode.CANNOT_REACH,"111","Incorrect input parameters!");
 		}
 		
 		UserCrededntialsInterface ui = new UserCrededntialsInterface();
-		ui.setInputFields("T24 password:", "Service password:").showUserDialog("Set credentials");
-					
-		//setFolder(folder); 
+		//ui.setInputFields("T24 password:", "Service password:").showUserDialog("Set credentials");
+
+		ui.setServicePassword(servicePassword);
+		ui.setT24password(t24password);
+		
+		setFolder(emptyCredentialFile); 
 		
 		if(serviceUrl.trim().length() == 0) {
 			serviceUrl = WS_HOST;
@@ -253,7 +283,8 @@ public class ConnectorConfig {
 
 		initIntegrationServiceFlow(serviceUrl+WS_NAME);
 		
-		setWsConnectorUser(username, ui.getServicePassword(), coCode); //setWsConnectorUser(username, password, coCode); 
+		//setWsConnectorUser(username, ui.getServicePassword(), coCode); 
+		setWsConnectorUser(username, password, coCode); 
 					
 		if(!isConnected()){ 
 			throw new ConnectionException(ConnectionExceptionCode.UNKNOWN_HOST,"112", "Can't connect to service!");
@@ -265,42 +296,48 @@ public class ConnectorConfig {
 		}
 		
 
-		setT24password( ui.getT24password());
+		//setT24password( ui.getT24password());
 
 		try{
-			String dir = ui.saveEncryptedFile(folder);
+			String dir = ui.saveEncryptedFile(emptyCredentialFile, this);
 			setFolder(dir); 
 		}catch(RuntimeException exception){
 			throw new ConnectionException(ConnectionExceptionCode.CANNOT_REACH,"111","Cannot save file!" + exception.getMessage());
 		}
+
 		setConnectorMode(ConnectorOperationMode.DESIGN_TIME);
 
 	}
 	
 	
 	@Connect
-	public void connect(@ConnectionKey String username, @Optional @Default("http://localhost:9089/axis2/services") String serviceUrl, @Optional @Default("GB0010001") String coCode, @Path @Optional @Default("D:/Schemas") String folder) throws ConnectionException{
-		if(!verifyUserInput(username, serviceUrl, folder, coCode)){
+	public void connect(@ConnectionKey String username, @Password String password
+			, @Optional @Default("http://localhost:9089/axis2/services") String serviceUrl
+			, @Optional @Default("GB0010001") String coCode
+			, @Path @Optional @Default("D:/Schemas") String emptyCredentialFile) throws ConnectionException{
+		if(!verifyUserInput(username, serviceUrl, emptyCredentialFile, coCode)){
 			throw new ConnectionException(ConnectionExceptionCode.CANNOT_REACH,"111","Incorrect input parameters!");
 		}
 		
 		////Modified////
 		UserCrededntialsInterface ui = new UserCrededntialsInterface();
-		String directory = ui.resolveCredentialFileAndPath(folder); //This returns the directory
+		Properties allProperties = ui.resolveCredentialFileAndPath(emptyCredentialFile); // This
 		
 		
-		setFolder(directory); // setFolder(folder);
+		//setFolder(directory); // 
+		setFolder(emptyCredentialFile);
 		
 		if(serviceUrl.trim().length() == 0) {
 			serviceUrl = WS_HOST;
 		}
 		setServiseURL(serviceUrl+WS_NAME);
 
-		setWsConnectorUser(username, ui.getServicePassword(), coCode);  //setWsConnectorUser(username, password, coCode);
+		//setWsConnectorUser(username, ui.getServicePassword(), coCode); 
+		setWsConnectorUser(username, password, coCode);
 		
 		
 		/////HERE IS THE PLACE FOR T24
-		setT24password( ui.getT24password());
+		//setT24password( ui.getT24password());
 
 		setConnectorMode(ConnectorOperationMode.RUN_TIME);
 	}

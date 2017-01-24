@@ -21,7 +21,7 @@ public class MetaDataExtractorTestCases {
 		
 		config.setNodeName("node1");
 		
-		config.testConnect("INPUTT", "http://localhost:9089/axis2/services/IntegrationFlowServiceWS?wsdl", "GB0010001","D:/Schemas/UserPass.txt");
+		config.testConnect("INPUTT","123456", "http://localhost:9089/axis2/services/IntegrationFlowServiceWS?wsdl", "GB0010001","D:/Schemas/UserPass.txt");
 		
 		
 		T24InboundConnector connector = new T24InboundConnector();

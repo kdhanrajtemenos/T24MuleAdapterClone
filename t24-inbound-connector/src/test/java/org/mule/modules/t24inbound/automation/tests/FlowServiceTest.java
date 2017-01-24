@@ -13,7 +13,7 @@ public class FlowServiceTest {
 		cf.setPort(4447);
 		cf.setAgentUser("INPUTT");
 		cf.setAgentHost("localhost");
-		cf.testConnect("INPUTT", "http://localhost:9089/axis2/services/IntegrationFlowServiceWS?wsdl","GB0010001", "D:/Schemas/UserPass.txt");
+		cf.testConnect("INPUTT", "123456", "http://localhost:9089/axis2/services/IntegrationFlowServiceWS?wsdl","GB0010001", "D:/Schemas/UserPass.txt");
 	}
 
 }
