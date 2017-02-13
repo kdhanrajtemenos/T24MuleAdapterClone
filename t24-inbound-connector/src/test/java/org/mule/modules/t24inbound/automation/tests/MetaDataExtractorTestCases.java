@@ -6,7 +6,6 @@ import org.mule.api.ConnectionException;
 
 import com.temenos.adapter.mule.T24inbound.connector.T24InboundConnector;
 import com.temenos.adapter.mule.T24inbound.connector.config.ConnectorConfig;
-import com.temenos.adapter.mule.T24inbound.connector.config.RuntimeConfigServerSelector;
 
 public class MetaDataExtractorTestCases {
 
@@ -14,15 +13,9 @@ public class MetaDataExtractorTestCases {
 	public static void main(String[] args) throws ConnectionException {
 		ConnectorConfig config = new ConnectorConfig();
 
-		config.setPort(4447);
-		config.setAgentUser("INPUTT");
-		config.setAgentHost("localhost");
-		config.setT24RunTime(RuntimeConfigServerSelector.JBOSS72);
-		
-		config.setNodeName("node1");
-		
-		config.testConnect("INPUTT","123456", "http://localhost:9089/axis2/services/IntegrationFlowServiceWS?wsdl", "GB0010001","D:/Schemas/UserPass.txt");
-		
+		config.setServiceUserName("INPUTT");
+		config.setServicePassword("123456");
+		config.testConnect("http://localhost:9089/axis2/services/IntegrationFlowServiceWS?wsdl");
 		
 		T24InboundConnector connector = new T24InboundConnector();
 		connector.setConfig(config);

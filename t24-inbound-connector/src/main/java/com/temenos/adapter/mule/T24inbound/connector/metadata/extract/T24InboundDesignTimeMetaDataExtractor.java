@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Properties;
 
 import com.temenos.adapter.mule.T24inbound.connector.config.ConnectorConfig;
 import com.temenos.adapter.mule.T24inbound.connector.metadata.model.InboundMetadataModel;
@@ -134,26 +133,20 @@ public class T24InboundDesignTimeMetaDataExtractor extends T24BaseInboundMetadat
             extractedDir = file.getParent(); // fix removing file name before extractions and save of files
         }
 		
-		String fullPath = ioProcessor.createDirectory(extractedDir, ""); 
+		String fullPath = ioProcessor.createDirectory(extractedDir, MAIN_FOLDER_NAME); 
+		fullPath = ioProcessor.createDirectory(fullPath, ADAPTER_FOLDER_NAME);
 		
-		String metadataRequestFolder = ioProcessor.createDirectory(fullPath, METADATA_FOLDER_NAME); // Metadata
-
 		String outSchemaFolder = ioProcessor.createDirectory(fullPath, OUTPUT_SCHEMA_FOLDER_NAME); // Output
-
+		String schema;
+		String outSchemaFile;
 		
 		for(InboundMetadataModel model : this.getOnlySelectable()){
-			String requestName = model.getName();
-			Properties prop = new Properties();
-			prop.put(ROOT_NAME_REQUEST_KEY, requestName);
-			
-			String schema = model.getMasterSchema().getContent();
 
-			String fileName = requestName + METADATA_FILE_EXT;
-			
-			String outSchemaFile = outSchemaFolder + File.separatorChar + OUTPUT_FILE_SHEMA_PREFIX + model.getName() + SCHEMA_FILE_EXT;
+			schema = model.getMasterSchema().getContent();
+
+			outSchemaFile = outSchemaFolder + File.separatorChar + OUTPUT_FILE_SHEMA_PREFIX + model.getName() + SCHEMA_FILE_EXT;
 				
 			try {
-				ioProcessor.writePropertiesToFile(prop, metadataRequestFolder, fileName);
 				ioProcessor.writeSchemas(outSchemaFile, schema);
 			} catch (IOException e) {
 				e.printStackTrace();

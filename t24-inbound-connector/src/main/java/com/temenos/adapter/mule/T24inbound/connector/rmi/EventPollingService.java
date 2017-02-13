@@ -82,15 +82,15 @@ public class EventPollingService {
 	    ArrayList<String> nodes = new ArrayList<String>();
 
 
-	    hosts.add(config.getAgentHost());
-	    ports.add(new Integer(config.getPort())); // 5456 from oracle config
+	    hosts.add(config.getT24Host());
+	    ports.add(new Integer(config.getT24Port())); // 5456 from oracle config
 	    nodes.add(config.getNodeName());
        
     	try {
 			configT24 = TAFJRuntimeConfigurationBuilder.createTAFJRuntimeConfiguration(
 			        TafjServerType.JBOSS_7_2.toString(),
-			        hosts, ports, nodes, config.getAgentUser(), 
-			        config.getT24password(), true, "");
+			        hosts, ports, nodes, config.getT24User(), 
+			        config.getT24Password(), true, "");
 		} catch (T24InvalidConfigurationException e) {
 			throw new RuntimeException("T24 configuration error: " + e.getMessage());
 		}
@@ -111,57 +111,37 @@ public class EventPollingService {
 		comp.add(config.getUserWsDeatils().getCoCode().getValue());
 		this.data = EventPollingData.newInstance(eventType, i, comp);
 
-	    
-
-	    	
 	    T24InboundServiceProvider provider = T24InboundServiceProviderFactory.getServiceProvider(configT24);
-	    
-
 	    
 		List<T24Event> result = null;
 		
-		//int error = 0;
 		try {
 			
-			//if(transactionListener != null && transactionListener.getTransactionMapSize()==0){
 			service = provider.getService(data);
-		
 	
 			service.begin();
-	
 			    
 			result =  service.execute(data);
 
-		    
 		    service.commit();
-		    
 
 		} catch (T24RuntimeException e) {  //thrown by getService(), begin(), commit()
+			if (service != null) {
+				service.rollback(); 
+			}
 			throw new RuntimeException("T24 error: " + e.getMessage());
 
 		} catch (T24EventPollingException e) { //thrown by execute()
+			if (service != null) {
+				service.rollback(); 
+			}
 			throw new RuntimeException("T24 error: " + e.getMessage());
 
 		}  finally {
-			//if(transactionListener == null){
-				try {
-						service.rollback();
-				} catch (T24RuntimeException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-				}
-					//config.getTransactionManager().rollback();
-				
-				if (service != null) {
-					
-					
-					
-					service.cleanUp(); //tova moje i da otpadne
-				}
-			//}
-
+			if (service != null) {
+				service.cleanUp(); // channel cleanup
+			}
 		}
-	    
 
 	    return result;
 	}

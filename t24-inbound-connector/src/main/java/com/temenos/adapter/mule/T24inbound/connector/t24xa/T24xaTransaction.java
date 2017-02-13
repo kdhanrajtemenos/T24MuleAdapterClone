@@ -11,7 +11,6 @@ import org.mule.transaction.AbstractSingleResourceTransaction;
 import org.mule.transaction.IllegalTransactionStateException;
 
 import com.temenos.adapter.common.runtime.T24RuntimeException;
-import com.temenos.adapter.common.runtime.inbound.EventPollingData;
 import com.temenos.adapter.common.runtime.inbound.T24Event;
 import com.temenos.adapter.common.runtime.inbound.T24EventPollingException;
 

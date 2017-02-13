@@ -11,7 +11,6 @@ import org.mule.api.transaction.TransactionException;
 import org.mule.api.transaction.UniversalTransactionFactory;
 import org.mule.transaction.TransactionCoordination;
 
-import com.temenos.adapter.common.runtime.inbound.EventPollingData;
 import com.temenos.adapter.common.runtime.inbound.T24Event;
 
 public class T24xaTransactionFactory implements UniversalTransactionFactory  {
@@ -57,6 +56,11 @@ public class T24xaTransactionFactory implements UniversalTransactionFactory  {
 				e.printStackTrace();
 			}
     	}
+    }
+    
+    public Transaction getCurrentTransaction() {
+
+    	return TransactionCoordination.getInstance().getTransaction();   	
     }
 
     public void rollback() {

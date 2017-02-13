@@ -1,5 +1,8 @@
 package com.temenos.adapter.mule.T24outbound.rmi;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.temenos.adapter.common.conf.T24RuntimeConfiguration;
 import com.temenos.adapter.common.runtime.T24RuntimeException;
 import com.temenos.adapter.common.runtime.outbound.T24OutboundRequestConverter;
@@ -14,7 +17,9 @@ import com.temenos.soa.services.data.CFConstants;
 
 public class OutboundRequestExecutor implements T24OutboundProcessor {
 
-	private T24OutboundServiceProvider outboundServiceProvider;
+    protected final transient Log log = LogFactory.getLog(getClass());
+
+    private T24OutboundServiceProvider outboundServiceProvider;
 	
 	T24RuntimeConfiguration runtimeConfiguration;
 
@@ -64,7 +69,13 @@ public class OutboundRequestExecutor implements T24OutboundProcessor {
 			err_msg = e.getMessage();
 			err_catch_up = true;
 		}
-		finally{
+		finally {
+			if(null != executor) {
+				// fix channels out problem
+				log.info("CleanUp executor in "+this.getClass());
+				executor.cleanUp();
+			}
+
 			if(err_catch_up){
 				/*
 				try {
@@ -85,6 +96,7 @@ public class OutboundRequestExecutor implements T24OutboundProcessor {
 				record.setResponse(null);
 				record.setReturnCode(CFConstants.RETURN_CODE_FAILURE);
 			}
+			
 		}
 		
 		return record;

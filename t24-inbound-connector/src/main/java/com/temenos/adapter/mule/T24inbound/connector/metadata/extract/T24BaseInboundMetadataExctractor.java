@@ -6,9 +6,7 @@ import java.util.List;
 //import java.util.Properties;
 
 import com.temenos.adapter.mule.T24inbound.connector.config.ConnectorConfig;
-import com.temenos.adapter.mule.T24inbound.connector.config.RuntimeConfigServerSelector;
 import com.temenos.adapter.mule.T24inbound.connector.metadata.extract.T24InboundAPICall;
-import com.temenos.adapter.mule.T24inbound.connector.metadata.extract.TAFCInboundAgent;
 import com.temenos.adapter.mule.T24inbound.connector.metadata.extract.TAFJInboundAgent;
 import com.temenos.adapter.mule.T24inbound.connector.metadata.model.InboundMetadataModel;
 import com.temenos.adapter.mule.T24inbound.connector.metadata.model.Metadata;
@@ -30,6 +28,8 @@ public class T24BaseInboundMetadataExctractor {
 	public static final String SERVICE_OPERATION_TARGET_KEY = "serviceOperationTarget";
 	public static final String SERVICE_OPERATION_NAME_KEY = "serviceOperationName";
 	
+	public static final String MAIN_FOLDER_NAME = "Schema";
+	public static final String ADAPTER_FOLDER_NAME = "Inbound";
 	public static final String METADATA_FOLDER_NAME = "Metadata";
 	public static final String INPUT_SCHEMA_FOLDER_NAME = "Input";
 	public static final String OUTPUT_SCHEMA_FOLDER_NAME = "Output";

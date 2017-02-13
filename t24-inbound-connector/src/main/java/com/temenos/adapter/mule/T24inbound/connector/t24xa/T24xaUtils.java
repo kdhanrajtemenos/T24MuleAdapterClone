@@ -2,10 +2,8 @@ package com.temenos.adapter.mule.T24inbound.connector.t24xa;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mule.api.MuleException;
 import org.mule.api.MuleRuntimeException;
 import org.mule.api.transaction.Transaction;
-import org.mule.api.transaction.TransactionException;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transaction.TransactionCoordination;
 

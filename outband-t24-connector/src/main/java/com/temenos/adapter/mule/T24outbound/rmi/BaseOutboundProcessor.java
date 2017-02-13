@@ -1,6 +1,8 @@
 package com.temenos.adapter.mule.T24outbound.rmi;
 
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.Logger;
 
 import com.temenos.adapter.common.conf.T24RuntimeConfiguration;
@@ -22,13 +24,13 @@ import com.temenos.adapter.oracle.outbound.request.exception.T24RequestProcessin
 /* This will be abstract */
 public class BaseOutboundProcessor implements T24OutboundProcessor{
 
-	private T24OutboundServiceProvider outboundServiceProvider;
+    protected final transient Log log = LogFactory.getLog(getClass());
+
+    private T24OutboundServiceProvider outboundServiceProvider;
 
 	public BaseOutboundProcessor(T24RuntimeConfiguration runtimeConfiguration, T24RequestSpec requestSpec) {
 		outboundServiceProvider = T24OutboundServiceProviderFactory.getServiceProvider( requestSpec.getT24RequestType(),runtimeConfiguration,requestSpec.getT24ServiceMetadata());
 	}
-
-	private static Logger log = Logger.getLogger(BaseOutboundProcessor.class);
 
 	private T24OutboundRequestConverter buildRequestProcessor() {
 		return outboundServiceProvider.getRequestConverter();
@@ -59,6 +61,7 @@ public class BaseOutboundProcessor implements T24OutboundProcessor{
 		}
 		
 		ResponseRecord record = new ResponseRecord();
+		T24OutboundRequestExecutor executor = null;
 		String response;
 		try {
 
@@ -69,7 +72,7 @@ public class BaseOutboundProcessor implements T24OutboundProcessor{
 				log.debug(ofsRequest);
 			}
 			
-			T24OutboundRequestExecutor executor = outboundServiceProvider.getRequestExecutor();
+			executor = outboundServiceProvider.getRequestExecutor();
 			String ofsResponse = executor.execute(ofsRequest);
 						
 			log.debug("OFS RESPONSE");
@@ -86,6 +89,13 @@ public class BaseOutboundProcessor implements T24OutboundProcessor{
 			throw new RuntimeException(e.getMessage());
 		} catch (T24RuntimeException e) {
 			throw new RuntimeException(e.getMessage());
+		}
+		finally {
+			if(null != executor) {
+				// fix channels out problem
+				log.info("CleanUp executor in "+this.getClass());
+				executor.cleanUp();
+			}
 		}
 		
 		record.setResponse(response);

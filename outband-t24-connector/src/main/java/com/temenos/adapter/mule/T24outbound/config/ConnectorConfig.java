@@ -1,9 +1,6 @@
 package com.temenos.adapter.mule.T24outbound.config;
 
-
-
-import java.nio.file.InvalidPathException;
-import java.nio.file.Paths;
+import java.io.File;
 import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
@@ -20,7 +17,6 @@ import org.mule.api.annotations.ValidateConnection;
 import org.mule.api.annotations.components.ConnectionManagement;
 import org.mule.api.annotations.display.FriendlyName;
 import org.mule.api.annotations.display.Password;
-//import org.mule.api.annotations.display.Password;
 import org.mule.api.annotations.display.Path;
 import org.mule.api.annotations.display.Placement;
 import org.mule.api.annotations.param.ConnectionKey;
@@ -48,6 +44,8 @@ import com.temenos.adapter.mule.T24outbound.utils.UserCredentialsInterface;
 @ConnectionManagement(configElementName = "config", friendlyName = "Connection Managament type strategy")
 public class ConnectorConfig {
 
+	public static final String DEFAULT_SETTINGS_FILE_NAME = "settings.txt"; 
+	
 	/**
 	 * Holding the SOAP User credentials
 	 */
@@ -97,8 +95,6 @@ public class ConnectorConfig {
 		this.settingsFolder = settingsFolder;
 	}
 	
-	
-	public static final String DEFAULT_SETTINGS_FILE_NAME = "settings.txt"; 
 	
 	private String settingsFileName;
 
@@ -159,20 +155,20 @@ public class ConnectorConfig {
 	
 
 	/**
-	 * T24 Runtime port
+	 * Defines T24 Server type
 	 */
 	@Configurable
-	@Default(value="4447")
-	@Placement(order = 1, group = "Connection Setting", tab = "Runtime Configuration")
-	@FriendlyName("T24 Port")
-	private Integer t24Port;
+	@FriendlyName("T24 Server Type")
+	@Placement(order = 1, group = "Connection Setting", tab = "Runtime")
+	@Default(value = "JBOSS_7_2") // 
+	private ServerType t24ServerType;
 
-	public Integer getT24Port() {
-		return t24Port;
+	public ServerType getT24ServerType() {
+		return t24ServerType;
 	}
 
-	public void setT24Port(Integer t24Port) {
-		this.t24Port = t24Port;
+	public void setT24ServerType(ServerType t24ServerType) {
+		this.t24ServerType = t24ServerType;
 	}
 	
 	
@@ -181,7 +177,7 @@ public class ConnectorConfig {
 	 */
 	@Configurable
 	@Default(value = "localhost")
-	@Placement(order = 2, group = "Connection Setting", tab = "Runtime Configuration")
+	@Placement(order = 2, group = "Connection Setting", tab = "Runtime")
 	@FriendlyName("T24 Host")
 	private String t24Host;
 
@@ -195,11 +191,30 @@ public class ConnectorConfig {
 		
 
 	/**
+	 * T24 Runtime port
+	 */
+	@Configurable
+	@Default(value="4447")
+	@Placement(order = 3, group = "Connection Setting", tab = "Runtime")
+	@FriendlyName("T24 Port")
+	private Integer t24Port;
+
+	public Integer getT24Port() {
+		return t24Port;
+	}
+
+	public void setT24Port(Integer t24Port) {
+		this.t24Port = t24Port;
+	}
+	
+	
+	/**
 	 * T24 credentials for User name
 	 */
 	@Configurable
+	@Default(value="SSOUSER1")
 	@Required
-	@Placement(order = 3, group = "Connection Setting", tab = "Runtime Configuration")
+	@Placement(order = 4, group = "Connection Setting", tab = "Runtime")
 	@FriendlyName("T24 User")
 	private String t24User;
 
@@ -213,12 +228,13 @@ public class ConnectorConfig {
 	
 	
 	/**
-	 * T24 credentials for User paswword	 
+	 * T24 credentials for User password	 
 	 */
 	@Configurable
+	@Default(value="123456")
 	@Required
 	@Password
-	@Placement(order = 4, group = "Connection Setting", tab = "Runtime Configuration")
+	@Placement(order = 5, group = "Connection Setting", tab = "Runtime")
 	@FriendlyName("T24 Password")
 	private String t24Password;
 	
@@ -232,29 +248,11 @@ public class ConnectorConfig {
 
 		
 	/**
-	 * Defines T24 Server type
-	 */
-	@Configurable
-	@FriendlyName("T24 Server Type")
-	@Placement(order = 5, group = "Connection Setting", tab = "Runtime Configuration")
-	@Default(value = "JBOSS_7_2")
-	private ServerType t24ServerType;
-
-	public ServerType getT24ServerType() {
-		return t24ServerType;
-	}
-
-	public void setT24ServerType(ServerType t24ServerType) {
-		this.t24ServerType = t24ServerType;
-	}
-	
-	
-	/**
 	 * Defines a list of comma separate node name values
 	 */	
 	@Configurable
 	@FriendlyName("T24 Node Names")
-	@Placement(order = 6, group = "Connection Setting", tab = "Runtime Configuration")
+	@Placement(order = 6, group = "Connection Setting", tab = "Runtime")
 	@Default(value = "node1")
 	private String t24NodeNmes;	
 	
@@ -284,9 +282,10 @@ public class ConnectorConfig {
 	private static final String INTGRATION_LANDSCAPE_SERVICE_WSDL = "IntegrationLandscapeServiceWS?wsdl";
 	
 	/**
-	 * Web service credentials for User name
+	 * Web service credentials User name
 	 */
 	@Configurable
+	@Default(value="INPUTT")
 	@Required 
 	@Placement(order = 1, group = "Connection", tab = "General")
 	private String serviceUserName;
@@ -301,9 +300,10 @@ public class ConnectorConfig {
 	
 	
 	/**
-	 * Web service credentials for User password
+	 * Web service credentials User password
 	 */
 	@Configurable
+	@Default(value="123456")
 	@Required
 	@Password
 	@Placement(order = 2, group = "Connection", tab = "General")
@@ -319,11 +319,12 @@ public class ConnectorConfig {
 	
 	
 	/**
-	 * Sets the connector configuration file and loaction which is used to store the connection setting,
+	 * Sets the connector configuration file and location which is used to store the connection setting,
 	 * and to define path to the folder where input and output schemas will be stored when metadata
 	 * discovery is used for Service Xml request. 
 	 */
 	@Configurable
+	@Default(value = DEFAULT_SETTINGS_FILE_NAME)
 	@Path
 	@Required
 	@Placement(order = 1, group = "Save Connection Setting", tab = "General")
@@ -350,12 +351,12 @@ public class ConnectorConfig {
 	 * @param serviceUrl - Web service URL (example: http://localhost:9089/axis2/services/)
 	 * @throws ConnectionException
 	 */
-	@TestConnectivity(label="Save Connection")
+	@TestConnectivity(label="Test and Save Settings")
 	public void testConnect(@ConnectionKey @Default("http://localhost:9089/axis2/services/") String serviceUrl) throws ConnectionException {
 
 		serviceUrl += INTGRATION_LANDSCAPE_SERVICE_WSDL;
 
-		String check = verifyDesingTimeInputs(serviceUserName, servicePassword, serviceUrl, settingsFilePath, t24User, t24Password);
+		String check = verifyConfigurationInputs(true, serviceUserName, servicePassword, serviceUrl, settingsFilePath, t24User, t24Password);
 		
 		if (!check.isEmpty() && !check.equals("Alternate resourse")) {
 			throw new ConnectionException(ConnectionExceptionCode.CANNOT_REACH, "111", "Incorrect input parameters! " + check);
@@ -368,6 +369,7 @@ public class ConnectorConfig {
 		initIntegrationServiceLandscape(serviceUrl);
 
 		setWsConnectorUser(serviceUserName, servicePassword); 
+				
 
 		if (!isConnected()) {
 			throw new ConnectionException(ConnectionExceptionCode.UNKNOWN_HOST, "112", "Can't connect to web service!");
@@ -390,6 +392,8 @@ public class ConnectorConfig {
 		
 		setServiseURL(serviceUrl);
 		
+		splitFullFileName();
+		
 		try {
 			ui.saveEncryptedFile(this);
 		} catch (RuntimeException exception) {
@@ -398,6 +402,27 @@ public class ConnectorConfig {
 		
 		setConnectorMode(ConnectorOperationMode.DESIGN_TIME);
 		
+		/*
+		// test exception - the only way to output debug information design time
+		String result = "";
+		for (Response resp : responseDetails.getResponses()) {
+			result += resp.getResponseCode().getValue() + " ";
+		}
+
+		throw new ConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS,"115", "WS call with user: "
+				+serviceUserName
+				+" password: "+servicePassword+" status returned: "+testSOAP+ " response codes: "+result);
+
+		 */
+	}
+	
+	private void splitFullFileName() {
+		// fill parsed settings file name and directory here
+        File file = new File(settingsFilePath);
+        if (file.isFile()) {
+        	setSettingsFolder(file.getParent());
+        	setSettingsFileName(file.getName());
+        }
 	}
 
 	/**
@@ -414,19 +439,17 @@ public class ConnectorConfig {
 		setServiseURL(serviceUrl);
 		
 		outBoundConnection = T24OutboundConfig.getInstance();
-		if(outBoundConnection.isConfigured()) return;
+		if(outBoundConnection.isConfigured()) {
+			return;
+		}
 		
-		String check = verifyDesingTimeInputs(serviceUserName, servicePassword, serviceUrl, settingsFilePath, t24User, t24Password);
+		// try loading from file
+		UserCredentialsInterface ui = new UserCredentialsInterface();
+		splitFullFileName();
+		Properties allProperties = ui.resolveCredentialFileAndPath(this);
 		
-		/* OK Let's suppose that user inputs are injected from flow XML...If it is the case, they are probably not null */		
-
-		if (!check.isEmpty()){	
-
-			/* Well the other case is they are Null and not injected ... try read them from settings file */
-
-			UserCredentialsInterface ui = new UserCredentialsInterface();
-			Properties allProperties = ui.resolveCredentialFileAndPath(this);
-
+		if(null != allProperties && null != allProperties.getProperty(UserCredentialsInterface.T24_HOST)) {
+			
 			String t24Host = allProperties.getProperty(UserCredentialsInterface.T24_HOST);
 			setT24Host(t24Host);
 			
@@ -450,12 +473,23 @@ public class ConnectorConfig {
 			String t24password = allProperties.getProperty(UserCredentialsInterface.T24_PASS);
 			setT24Password(t24password);
 			
+			// last two seems redundant
 			String servicepassword = allProperties.getProperty(UserCredentialsInterface.SERVICE_PASS);
 			setServicePassword(servicepassword);
 			
 			String serviceusername = allProperties.getProperty(UserCredentialsInterface.SERVICE_USER);
 			setServiceUserName(serviceusername);
+			
+		}
 		
+		String check = verifyConfigurationInputs(false, serviceUserName, servicePassword, serviceUrl, settingsFilePath, t24User, t24Password);
+		
+		/* OK Let's suppose that user inputs are injected from flow XML...If it is the case, they are probably not null */		
+
+		if (!check.isEmpty()) {	
+			// we have errors in check parameters
+
+			throw new RuntimeException("Bad runtime configuration: "+check);
 		}
 		
 		setWsConnectorUser(serviceUserName, servicePassword);
@@ -467,15 +501,20 @@ public class ConnectorConfig {
 
 	}
 
-	private String verifyDesingTimeInputs(String serviceUserName, String servicePassword, String serviceUrl, String settingsFilePath, String t24User, String t24Password) {
-		if (serviceUserName == null ||StringUtils.isBlank(serviceUserName)) {
+	private String verifyConfigurationInputs(boolean isDesignTime, String serviceUserName, String servicePassword, String serviceUrl, String settingsFilePath, String t24User, String t24Password) {
 
-			return "Service username is empty";
-		}
+		// no need to check service parameters runtime
 		
-		if (servicePassword == null ||StringUtils.isBlank(servicePassword)) {
+		if(isDesignTime) {
+			if (serviceUserName == null ||StringUtils.isBlank(serviceUserName)) {
 
-			return "Service password is empty";
+				return "Service username is empty";
+			}
+			
+			if (servicePassword == null ||StringUtils.isBlank(servicePassword)) {
+			
+				return "Service password is empty";
+			}
 		}
 		
 		if (serviceUrl== null || StringUtils.isBlank(serviceUrl) || !AddressChecker.isValidURL(serviceUrl)) {
@@ -502,28 +541,28 @@ public class ConnectorConfig {
 			return "Settings file path is empty";
 		}
 		
-		boolean success = false;
-		try{
-			java.nio.file.Path p =  Paths.get(settingsFilePath);
-			settingsFileName = p.getFileName().toString();
-			settingsFolder = p.getParent().toString();
-			success = true;
-		}catch(InvalidPathException e){
-			
-		}catch(Exception e){
-			
-		}finally{
-		
-			if(!success){
-				if(settingsFileName==null ||StringUtils.isBlank(settingsFileName)){
-					settingsFileName = DEFAULT_SETTINGS_FILE_NAME;
-				}
-				if(settingsFolder == null || StringUtils.isBlank(settingsFolder)){
-					settingsFolder ="";
-				}
-				return "Alternate resourse";
-			}
-		}
+//		boolean success = false;
+//		try{
+//			java.nio.file.Path p =  Paths.get(settingsFilePath);
+//			settingsFileName = p.getFileName().toString();
+//			settingsFolder = p.getParent().toString();
+//			success = true;
+//		}catch(InvalidPathException e){
+//			
+//		}catch(Exception e){
+//			
+//		}finally{
+//		
+//			if(!success){
+//				if(settingsFileName==null ||StringUtils.isBlank(settingsFileName)){
+//					settingsFileName = DEFAULT_SETTINGS_FILE_NAME;
+//				}
+//				if(settingsFolder == null || StringUtils.isBlank(settingsFolder)){
+//					settingsFolder ="";
+//				}
+//				return "Alternate resourse";
+//			}
+//		}
 
 		return "";
 	}

@@ -44,7 +44,7 @@ public class T24OutboundConfig {
 	private static final int DEFAULT_ACTION_TIMEOUT = 30;
 	private static final int DEFAULT_IDLE_TIMEOUT = 1800;
 	private static final String EJB_CLIENT_NAMING = "org.jboss.ejb.client.naming";
-	private static final String JBOSS_VERSION = "JBoss 7.2";
+	public static final String JBOSS_VERSION = "JBoss 7.2";
 	private static final String DEAFAULT_CHARSET = "UTF-8";
 	
 	private static final String TAFJ_CONNCECTION_TYPE = "WebService";
@@ -53,9 +53,7 @@ public class T24OutboundConfig {
 	private static final String TAFJ_REMOTE_CONNECTION_HOST = "RemoteConnectionHost";
 	private static final String TAFJ_REMOTE_CONNECTION_PORT = "RemoteConnectionPort"; //RemoteConnectionPort //remote.connection.default.port
 	private static final String JBOSS_NODE_NAME = "JbossNodeName";
-	
-	private static final String JBOSS_NODE_NAME_VALUE = "node1";
-	
+		
 	private static final String WEBLOGIC_PROTOCOL_VALUE="t3";
 	
 	
@@ -474,7 +472,7 @@ public class T24OutboundConfig {
         jbossProperties.put("remote.connection.default.connect.options.org.xnio.Options.SASL_POLICY_NOANONYMOUS", "false");
         jbossProperties.put("remote.connection.default.connect.options.org.xnio.Options.SASL_POLICY_NOPLAINTEXT", "false");
         jbossProperties.put("remote.connection.default.username", connectionProperties.getProperty("SecurityPrincipal"));
-        String passwordBase64 = connectionProperties.getProperty("SecurityCredentialBase64");
+//        String passwordBase64 = connectionProperties.getProperty("SecurityCredentialBase64");
 //        if(ConfigDataUtil.isNotEmpty(passwordBase64)) {
 //            jbossProperties.put("remote.connection.default.password.base64", passwordBase64);
 //        } else {

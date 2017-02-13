@@ -1,4 +1,4 @@
-package com.temenos.adapter.mule.T24outbound.utils;
+package com.temenos.adapter.mule.T24inbound.connector.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,25 +18,27 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.temenos.adapter.mule.T24outbound.config.ConnectorConfig;
-import com.temenos.adapter.mule.T24outbound.config.RuntimeConfigSelector;
-import com.temenos.adapter.mule.T24outbound.config.ServerType;
+import com.temenos.adapter.mule.T24inbound.connector.config.ConnectorConfig;
+import com.temenos.adapter.mule.T24inbound.connector.config.RuntimeConfigSelector;
+import com.temenos.adapter.mule.T24inbound.connector.config.RuntimeConfigServerSelector;
 import com.temenos.soa.utils.StringUtils;
 
 public class UserCredentialsInterface {
 
-    protected final transient Log log = LogFactory.getLog(getClass());	
+    protected final transient Log log = LogFactory.getLog(getClass());
 	
+	public static final String T24_PASS = "T24_PASS";
 	public static final String SERVICE_PASS = "SERVICE_PASS";
-	public static final String SERVICE_USER = "SERVICE_USER";
 	public static final String T24_RUNTIME = "T24_RUNTIME";
 	public static final String T24_SERVER_TYPE = "T24_SERVER_TYPE";
 	public static final String T24_PORT = "T24_PORT";
 	public static final String T24_HOST = "T24_HOST";
 	public static final String T24_USER = "T24_USER";
-	public static final String T24_PASS = "T24_PASS";
 	public static final String T24_NODE_NAMES = "T24_NODE_NAMES";
 	public static final String FOLDER = "FOLDER";
+	public static final String T24_EJB_STATEFUL = "T24_EJB_STATEFUL";
+	public static final String T24_EJB_NAME = "T24_EJB_NAME";
+	
 	
 	private String t24password;
 	
@@ -92,30 +94,34 @@ public class UserCredentialsInterface {
 	}
 	
 	public void saveEncryptedFile(ConnectorConfig config) throws RuntimeException {
-			
 		
-		/* encrypt user paswords */
 		Properties prop = new Properties();
 		try {
-			
-			prop.put(SERVICE_PASS, PasswdUtil.encrypt(servicePassword));
-			prop.put(SERVICE_USER, config.getServiceUserName());
+			//prop.put(SERVICE_PASS, PasswdUtil.encrypt(servicePassword));
+			prop.put(T24_SERVER_TYPE, RuntimeConfigServerSelector.getRuntimeConfigServerSelector(config.getT24RunTime()));
 			prop.put(T24_RUNTIME, RuntimeConfigSelector.getRunTimeSelector(RuntimeConfigSelector.TAFJ));
-			prop.put(T24_SERVER_TYPE, ServerType.getServerTypeSelector(config.getT24ServerType()));
-			prop.put(T24_PORT, String.valueOf(config.getT24Port()));
 			prop.put(T24_HOST, config.getT24Host());
+			prop.put(T24_PORT, String.valueOf(config.getT24Port()));
+			prop.put(T24_NODE_NAMES, config.getNodeName());
 			prop.put(T24_USER, config.getT24User());
+
+			// encrypt user password 
 			prop.put(T24_PASS, PasswdUtil.encrypt(t24password));
-			prop.put(T24_NODE_NAMES, config.getT24NodeNmes());
+
+			prop.put(T24_EJB_STATEFUL, config.getEjbStateful().toString());
+			
+			if(null != config.getEjbName() && 0 != config.getEjbName().length()) {
+				prop.put(T24_EJB_NAME, config.getEjbName());
+			}
+			
 		} catch (GeneralSecurityException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("GeneralSecurityException in property creation "+e.getMessage());
 		}
 		
-		// will write the properties to the file in the given folder 
-		IoResourceUtil io = new IoResourceUtil();
-		//if(!io.writePropertiesToFile(prop, config.getSettingsFolder(), config.getSettingsFileName())){
+		/* will write the properties to the file in the given folder */
+		IoResourseUtil io = new IoResourseUtil();
 		if(!io.writePropertiesToFile(prop, config.getSettingsFilePath())){
-			throw new RuntimeException("Cannot resolve directory for writing " + config.getSettingsFolder()   +  " filename " + config.getSettingsFileName() );
+			throw new RuntimeException("Cannot resolve directory for writing");
 		}
 	}
 	
@@ -152,7 +158,7 @@ public class UserCredentialsInterface {
 	private InputStream tryResolveResourse(String fName, String path){
 		
 		/* get the last sub-folder */
-		String alternateDir = path.substring(0, path.lastIndexOf(File.separatorChar));
+		String alternateDir = path.substring(0,path.lastIndexOf(File.separator));
 		
 		/* try several file path locations for resolving at run-time...Note that: "/"+fname - should work at metadata discovery
 		 * and fName should work at run-time */
@@ -161,14 +167,14 @@ public class UserCredentialsInterface {
 		InputStream is = null;
 		for(String location : possibleLoacations){
 			is = tryInStreams(location);
-			if(is != null) {
+			if(is != null) { 
 				log.debug("Load runtime configuration from location: "+location);
 				break;
 			}
 		}
 		if(is==null){
 			try {
-				/* this should work if storage folder is not part of the flow project */
+				/* this should work if storrage folder is not part of flow project */
 				is = new FileInputStream( path + "/" +fName);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -179,110 +185,113 @@ public class UserCredentialsInterface {
 	}
 	
 	/**
+	 * Extract parameters from file
 	 * 
-	 * @param connectorConfig - path to credentials file e.g. C:\directory\...\filename.ext
-	 * @return the directory path where file exists...this path will be used also for saving the Meta data properties files;
-	 * @throws RuntimeException
+	 * @param filePath - path to credentials file e.g. C:\directory\...\filename.ext
+	 * @return property object from file or null 
 	 */
-	public Properties resolveCredentialFileAndPath(ConnectorConfig config) throws RuntimeException {
-		
-		String filePath = config.getSettingsFilePath();
+	public Properties resolveCredentialFileAndPath(String filePath)  {
 		
 		/* Check if the input parameter is valid file path */
-		if(StringUtils.isNullOrEmpty(filePath)){
-			//throw new RuntimeException("invalid settings file path");
+		if(StringUtils.isNullOrEmpty(filePath) ){
 			return null;
-		}	
-		
-		/* Split the the directory path and filename*/
-		String folder = "";
-		String fileName = ConnectorConfig.DEFAULT_SETTINGS_FILE_NAME; //default
-		
-		boolean isFile = IoResourceUtil.isFile(filePath);
-		
-		boolean readSettingsMode = false;
-		if(!isFile){
-			fileName = config.getSettingsFileName();
-			folder = config.getSettingsFolder();
-			readSettingsMode =  true;
-		}else{
-			boolean isDirectory  = IoResourceUtil.isDir(filePath);
-			if(isDirectory){
-				folder = filePath;
-				fileName = ConnectorConfig.DEFAULT_SETTINGS_FILE_NAME;
-				readSettingsMode =  true;
-			}else{
-				readSettingsMode = false;
-			}
 		}
 		
-		if(!readSettingsMode){
-			filePath = filePath.replace("/", File.separator);
-			folder = filePath.substring(0,filePath.lastIndexOf(File.separatorChar) );
-			fileName  = filePath.substring(filePath.lastIndexOf(File.separatorChar)+1);
+		boolean readMode;
+		
+		if(!IoResourseUtil.isDir(filePath)){
+			readMode = false;
+		}else{
+			readMode = true;
+		}
+		
+		/* Split the the directory path and filename*/
+		String folder = null;
+		String fileName = null;
+		filePath = filePath.replace("/", File.separator);
+		int filePathSeparratorIdx = filePath.lastIndexOf(File.separator);
+		if(filePathSeparratorIdx != -1 && filePathSeparratorIdx<filePath.length()){
+			folder = filePath.substring(0,filePathSeparratorIdx );
+			fileName = filePath.substring(filePathSeparratorIdx + 1);
+		}else{
+			return null;
+			//throw new RuntimeException("the given file is not valid");
 		}
 		
 		/* try to read the resource file. The folder parameter will be used as last option otherwise it will be ignored  */
-		InputStream is = tryResolveResourse(fileName, folder);
-		if(is==null){
-			//throw new RuntimeException("cannot load resourse! " + fileName);
-			return null;
+		InputStream is = null;
+		Properties p = null;
+		if(!readMode){
+			 is = tryResolveResourse(fileName, folder);
+			 if(is==null){
+				return null;
+				//throw new RuntimeException("cannot load resourse from design time! " + fileName);
+			 }
+		}else{
+			IoResourseUtil io =  new IoResourseUtil();
+			try{
+				//System.out.println("Loading..." + fileName);
+				p = io.readResourseFile(fileName, folder + File.separatorChar, IoResourseUtil.LOAD_SCHEMA);
+				
+			}catch(RuntimeException e){
+				return null;
+				//throw new RuntimeException(e);
+			}
 		}
+		
+
 		
 		/* load file contents in to properties object */
 		Properties prop = new Properties();
 		try {
-			prop.load(is);
+			if(!readMode){
+				prop.load(is);
+			}else{
+				if(p.isEmpty()){
+					return null;
+					//throw new RuntimeException("cannot load resource for run-time! " + fileName);
+				}
+				prop = p;
+			}
 		} catch (IOException e) {
+			return null;
 			//throw new RuntimeException(e.getMessage());
-			return null;
 		}
-		if(prop == null ||prop.isEmpty()){ 
-			//throw new RuntimeException("properties file corrupted! ");
+		if(prop == null ||prop.isEmpty()){
 			return null;
+			//throw new RuntimeException("properties file corrupted! ");
 		}
 		
-		if(is != null){
-			try {
-				is.close();
-			} catch (IOException e) {
-
-			}finally{
-				
-			}
-		}
 		/* Get encrypted passwords */
 		String encT24Pass = prop.getProperty(T24_PASS);		
-		String encServicePass  = prop.getProperty(SERVICE_PASS);
+		//String encServicePass  = prop.getProperty(SERVICE_PASS);
 		
 		if(StringUtils.isNullOrEmpty(encT24Pass)){
-			//throw new RuntimeException("setting file is corrupted!");
 			return null;
+			//throw new RuntimeException("credential file is corrupted!");
 		}
-
-		// no strict check for service password in the configuration file - not mandatory
-//		if(StringUtils.isNullOrEmpty(encServicePass)){
-//			throw new RuntimeException("setting file is corrupted!");
-//		}
 		
-		// decrypt passwords and store them into this instance fields 
-		// for use in connector configuration at run-time and metadata discovery
-		this.setT24password(PasswdUtil.decrypt(encT24Pass));
+		/* decrypt passwords and store them into this instance fields for use in the connector configuration at run-time and metadata discovery */
+		String decryptedPass = PasswdUtil.decrypt(encT24Pass);
+		//this.setServicePassword(PasswdUtil.decrypt(encServicePass));
 		
-		if( ! StringUtils.isNullOrEmpty(encServicePass) ) {
-			this.setServicePassword(PasswdUtil.decrypt(encServicePass));
-		}
-	
+		prop.put(T24_PASS, decryptedPass );
 		
-		prop.put(T24_PASS, this.getT24password() );
-		prop.put(SERVICE_PASS, this.getServicePassword() );
+		//prop.put(SERVICE_PASS, this.getServicePassword() );
 		prop.put(FOLDER, folder);
 		
-		
-		config.setSettingsFileName(fileName);
-		config.setSettingsFolder(folder);
-
 		return prop;
+	}
+	
+	public static void main(String [] args) {
+		if(args.length > 0) {
+			try {
+				System.out.print("Encrypted value of parameter ["+args[0]+"] = " + PasswdUtil.encrypt(args[0]));
+			} catch (GeneralSecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	

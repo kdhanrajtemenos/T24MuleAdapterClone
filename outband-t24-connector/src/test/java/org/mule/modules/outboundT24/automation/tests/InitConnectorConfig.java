@@ -15,13 +15,12 @@ import com.temenos.adapter.oracle.util.PasswdUtil;
 public class InitConnectorConfig {
 	
 	/* FOR CONNECTOR CONFIGURATION */	
-	private static final String WS_USR_NAME = "WS_USR_NAME";
-	private static final String WS_ENC_PASS= "WS_ENC_PASS";
+//	private static final String WS_USR_NAME = "WS_USR_NAME";
+//	private static final String WS_ENC_PASS= "WS_ENC_PASS";
 	
 	private static final String AGENT_USR_NAME = "AGENT_USR_NAME";
 	private static final String AGENT_ENC_PASS= "AGENT_ENC_PASS";
 	
-	private static final String WS_CO_CODE= "WS_CO_CODE";
 	private static final String WSDL_LOCATION = "WSDL_LOCATION";
 	private static final String AGENT_PORT= "AGENT_PORT";
 	private static final String AGENT_HOST= "AGENT_HOST";
@@ -112,13 +111,12 @@ public class InitConnectorConfig {
 			throw new ConnectionException(ConnectionExceptionCode.CANNOT_REACH,"401","Incorrect config resource!");
 		}
 		
-		String username = configProperties.getProperty(WS_USR_NAME, "INPUTT");
-		String password = configProperties.getProperty(WS_ENC_PASS, "123456");
-		if(!password.endsWith("123456")){
-			password = PasswdUtil.decrypt(password);
-		}
+//		String username = configProperties.getProperty(WS_USR_NAME, "INPUTT");
+//		String password = configProperties.getProperty(WS_ENC_PASS, "123456");
+//		if(!password.endsWith("123456")){
+//			password = PasswdUtil.decrypt(password);
+//		}
 		
-		String compcode = configProperties.getProperty(WS_CO_CODE, "GB0010001");
 		String agenthost = configProperties.getProperty(AGENT_HOST, "localhost");
 		String _agentport = configProperties.getProperty(AGENT_PORT, "4447");
 		String agentType = configProperties.getProperty(AGENT_TYPE, "TAFJ");
@@ -128,7 +126,7 @@ public class InitConnectorConfig {
 		String _directory = configProperties.getProperty(SERVICE_XML_SCHEMA_DIR, "D:/Schemas");
 		
 		if(!_agentPass.endsWith("123456")){
-			_agentPass = PasswdUtil.decrypt(password);
+			_agentPass = PasswdUtil.decrypt(_agentPass);
 		}
 		
 		String wsdllocation = configProperties.getProperty(WSDL_LOCATION, "http://localhost:9089/axis2/services/IntegrationLandscapeServiceWS?wsdl");

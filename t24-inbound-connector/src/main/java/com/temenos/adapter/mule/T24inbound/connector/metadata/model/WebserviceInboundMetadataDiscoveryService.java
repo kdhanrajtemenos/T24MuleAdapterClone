@@ -60,7 +60,7 @@ public class WebserviceInboundMetadataDiscoveryService
     
     T24UserDetails t24UserDetails = buildT24UserDetails(this.configuration.getUserName(), this.configuration.getPassword());
     
-    GetAllFlowNamesResponse getflowNamesResponse = service.getAllFlowNames(t24UserDetails);
+    GetAllFlowNamesResponse2 getflowNamesResponse = service.getAllFlowNames(t24UserDetails);
     
     ResponseDetails responseDetailsElement = (ResponseDetails)getflowNamesResponse.getResponseDetails().getValue();
     if (!"FAILURE".equals(responseDetailsElement.getReturnCode().getValue()))
@@ -129,7 +129,7 @@ public class WebserviceInboundMetadataDiscoveryService
     
     T24UserDetails t24UserDetails = buildT24UserDetails(this.configuration.getUserName(), this.configuration.getPassword());
     
-    GetFlowSchemaResponse flowSchemaResponse = service.getFlowSchema(t24UserDetails, flowName);
+    GetFlowSchemaResponse2 flowSchemaResponse = service.getFlowSchema(t24UserDetails, flowName);
     
     ResponseDetails responseDetailsElement = (ResponseDetails)flowSchemaResponse.getResponseDetails().getValue();
     if (!"FAILURE".equals(responseDetailsElement.getReturnCode().getValue()))

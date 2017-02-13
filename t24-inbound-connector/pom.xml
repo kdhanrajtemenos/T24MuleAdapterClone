@@ -56,17 +56,18 @@
 		
 		<!-- TEMENOS COMMON ADDAPTER -->
         <dependency>
-		      <groupId>com.temenos.technology.integrationframework</groupId>
+		      <groupId>t24.adapter.common</groupId>
 		      <artifactId>t24-adapter-common</artifactId>
-		      <version>1.0.1-SNAPSHOT</version>
+		      <version>1.0.2-SNAPSHOT</version>
 		</dependency>
 		
-		<!-- TEMENOS ORACLE SUPPORT -->
+		<!-- TEMENOS ORACLE SUPPORT 
 		<dependency>
 		      <groupId>com.temenos.technology.integrationframework.adapters.oracle</groupId>
 		      <artifactId>t24-oracle-adapter</artifactId>
 		      <version>DEV.0.0-SNAPSHOT</version>
 		</dependency>
+		-->
 		
 		<!-- TEMENOS TAFJ SUPPORT -->
 		<dependency>
@@ -114,14 +115,14 @@
 		<dependency>
 		      <groupId>com.temenos.t24.ifservice.ejb</groupId>
 		      <artifactId>com-temenos-t24-ifservice-ejb</artifactId>
-		      <version>1.0.0-SNAPSHOT</version>
+		      <version>1.0.1-SNAPSHOT</version>
 		</dependency> 
 		    
 		<!-- TEMENOS DATA SUPPORT -->   	  
 		<dependency>
 		      <groupId>com.temenos.t24.ifservice.data</groupId>
 		      <artifactId>com-temenos-t24-ifservice-data</artifactId>
-		      <version>1.0.0-SNAPSHOT</version>
+		      <version>1.0.1-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>

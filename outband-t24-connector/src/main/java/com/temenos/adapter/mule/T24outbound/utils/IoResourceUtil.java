@@ -11,9 +11,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.Properties;
 
@@ -116,25 +114,18 @@ public class IoResourceUtil {
 	}
 	
 	public static boolean isFile(String filePath){
-		if(filePath == null || filePath.isEmpty()) return false;
+		if(filePath == null || filePath.isEmpty()) {
+			return false;
+		}
 		File dir = new File(filePath);
-		Path file = dir.toPath();
-	
-		if (file == null || !Files.exists(file)) return false;
-		return true;
+		return dir.isFile();
 	}
 	
-	public static boolean isDirSyntaxCorrect(String path) {
-        try {
+	public static boolean isDir(String path) {
+		
+		File file = new File(path);
 
-        	Paths.get(path);
-        }catch (InvalidPathException e) { 
-            return false;
-        }catch ( NullPointerException e){
-        	return false;
-        }
-
-        return true;
+        return file.isDirectory();
     }
 
 	/**
@@ -292,15 +283,16 @@ public class IoResourceUtil {
 	/**
 	 * Writes Properties object to file
 	 * @param prop
-	 * @param filename
+	 * @param directory extracted directory to property file
+	 * @param filename extracted file name
 	 * @return true or false
 	 */
-	public boolean writePropertiesToFile(Properties prop, String directory ,String filename){
+	public boolean writePropertiesToFile(Properties prop, String directory, String filename){
 		OutputStream  fos= null;
 		try{
 
 			File f = null; 
-			f= new File(directory+File.separatorChar+ filename); ///src/main/api/ , paswor
+			f= new File(directory+File.separatorChar+ filename); // ??? /src/main/api/ , password
 			fos = new FileOutputStream(f);
 			prop.store(fos, null);
 		}catch (FileNotFoundException e) {
@@ -317,6 +309,40 @@ public class IoResourceUtil {
 				}
 			}else{
 				System.out.println("Can't resolve schema directory for writing");
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Writes Properties object to file
+	 * @param prop
+	 * @param filename - full file name with path
+	 * @return true or false
+	 */
+	public boolean writePropertiesToFile(Properties prop, String filename){
+		OutputStream  fos= null;
+		try{
+
+			File f = null; 
+			f= new File(filename); // create file by name
+			fos = new FileOutputStream(f);
+			prop.store(fos, null);
+		}catch (FileNotFoundException e) {
+			return false;
+		}catch (IOException e) {
+			return false;
+		}
+		finally {
+			if (fos != null) {
+				try {
+					fos.close();
+				} catch (IOException e) {
+					return false;
+				}
+			}else{
+				System.out.println("Can't resolve configuration file for writing");
 				return false;
 			}
 		}
@@ -343,4 +369,6 @@ public class IoResourceUtil {
 		}
 		return fullFolder;
 	}
+	
+	
 }

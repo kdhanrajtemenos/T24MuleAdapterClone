@@ -75,7 +75,7 @@ public class DataSenseResolver {
     		}
     		
     	
-    		String xsdDirectory =  config.getFolder();
+    		String xsdDirectory =  config.getSettingsFolder();
     		if(xsdDirectory==null || xsdDirectory.isEmpty()){
     			throw new ConnectionException(ConnectionExceptionCode.UNKNOWN, "308", "User directory is null or empty");
     		}

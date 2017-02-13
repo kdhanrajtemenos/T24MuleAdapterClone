@@ -130,8 +130,8 @@ public class T24InboundConnector {
 				@Override
 				public void onNotification(TransactionNotification notif) { // TransactionNotification / ServerNotification
 					
-					if(pollService ==null){
-						System.out.println("Cant'use pooling service transcation within notification ");
+					if(pollService == null){
+						log.info("Can't use pooling service transcation within notification listener");
 						return;
 					}
 					
@@ -142,22 +142,9 @@ public class T24InboundConnector {
 					String actionName = notif.getActionName();
 					String transactionId = notif.getTransactionStringId();
 					
-			    	System.out.println("	TransactionNotification: " + actionName);						
-			    	System.out.println("	TransactionStringId: " + transactionId);						
-			    	System.out.println("	Timestamp: " + new Date(notif.getTimestamp()));
-			    	
-					
-			    	
-			    	if(actionName.equals("begin")){
-			    		//transactonNotifiactionService.getService().beginExecution();
-					}else if(actionName.equals("commit")){
-						//transactonNotifiactionService.getService().commitExecution();
-					}else{ 
-						//transactonNotifiactionService.getService().rollBackExecution();
-						//if it goes to hear for some bad reason, T24 should roll back
-						
-					}
-		
+					log.debug("	TransactionNotificationListener TransactionNotification: " + actionName);						
+			    	log.debug("	TransactionNotificationListener TransactionStringId: " + transactionId);						
+			    	log.debug("	TransactionNotificationListener Timestamp: " + new Date(notif.getTimestamp()));
 				}
 
 		    };
@@ -169,7 +156,7 @@ public class T24InboundConnector {
 				@Override
 				public void onNotification(ExceptionNotification notification) {
 					if(pollService ==null){
-						System.out.println("Cant'use pooling service within exception notification listener!");
+						log.info("Cant'use pooling service within exception notification listener!");
 						return;
 					}
 					
@@ -181,20 +168,20 @@ public class T24InboundConnector {
 					String actionName  = notification.getActionName();
 					
 					
-					System.out.println("	ExceptionNotification: " + actionName);						
-			    	System.out.println("	ExceptionStringId: " + actionId);						
-			    	System.out.println("	Timestamp: " + new Date(notification.getTimestamp()));
+					log.info("	ExceptionNotificationListener ExceptionNotification: " + actionName);						
+					log.info("	ExceptionNotificationListener ExceptionStringId: " + actionId);						
+			    	log.info("	ExceptionNotificationListener Timestamp: " + new Date(notification.getTimestamp()));
 			    	
 					
 					Throwable t =  notification.getException();
 					
 					//muleContext.getTransactionManager().getTransaction().getStatus();
-					if( t instanceof Exception ){
-						transactonNotifiactionService.getService().rollBackExecution();
-					}
-					else if( t instanceof RuntimeException ){
-						transactonNotifiactionService.getService().rollBackExecution();
-					}
+//					if( t instanceof Exception ){
+//						transactonNotifiactionService.getService().rollBackExecution();
+//					}
+//					else if( t instanceof RuntimeException ){
+//						transactonNotifiactionService.getService().rollBackExecution();
+//					}
 					
 				}
 		    	
@@ -221,49 +208,111 @@ public class T24InboundConnector {
     @Processor
     @Summary("This method extracts messages from T24 server")
     public List<T24Event> eventPool(MuleEvent event, @MetaDataKeyParam String eventType, @Default("1") int batchSize) throws ConnectionException {
-    	/*
-    	//if(t24xaResource == null){
-	    	muleContext.getTransactionFactoryManager().registerTransactionFactory(T24xaResourse.class, new T24xaTransactionFactory());
-	    	try{
-	    		pollService = EventPollingService.getInstance(config);
-	    		
-	    		t24xaResource = new T24xaResourse(pollService.getService(eventType, 1), pollService.getData());
-	    		
-	        	muleContext.getRegistry().registerObject(T24xaUtils.TRANSACTION_RSOURSE_TYPE, t24xaResource);
-	        } catch (RegistrationException re) {
-	        	logger.warn("T24xa context injections processor already registered.");
-	        }
-    	//}
-    	*/
     	
-    	//T24xaResourse T24xaResourse = T24xaUtils.getTransactionalResource(t24xaResource, config);
-    	
-    	
-    	
-    	List<T24Event> events = new ArrayList<T24Event>();
+    	List<T24Event> events;
 
+	    log.info("Enter @Processor method eventPool for event name: " + eventType + " and batchSize: "+ batchSize);
 
         	
-        	try {
+//        	try {
         		
         		pollService = EventPollingService.getInstance(config);
 				
-        		T24xaResourse t24xaResource = new T24xaResourse(pollService.getService(pollService.getEventType(), pollService.getEventCount()), pollService.getData());
-        		
-        		T24xaTransactionFactory txFactory = (T24xaTransactionFactory) muleContext.getTransactionFactoryManager().getTransactionFactoryFor(T24xaResourse.class);
-        		
-        		events = txFactory.executeTransaction(muleContext, t24xaResource);
-        		
-        		//txFactory.commit();
-        
-			}  catch (TransactionException e) {
+//        		T24xaResourse t24xaResource = new T24xaResourse(pollService.getService(pollService.getEventType(), pollService.getEventCount()), pollService.getData());
+//        		
+//        		T24xaTransactionFactory txFactory = (T24xaTransactionFactory) muleContext.getTransactionFactoryManager().getTransactionFactoryFor(T24xaResourse.class);
+//        		
+//        		events = txFactory.executeTransaction(muleContext, t24xaResource);
+//        		
+//        		//txFactory.commit();
+//        
+//			}  catch (TransactionException e) {
+//				throw new ConnectionException(ConnectionExceptionCode.CANNOT_REACH,"111",e.getMessage());
+//			}
+
+    		try {
+    			events = pollService.getT24Events(eventType, batchSize);
+
+    			log.info("T24 extracted messages size: " + events.size());
+			    for (T24Event item : events) {
+				    log.info("Process event with ID: " + item.getId());
+				    log.info("Process event with content: " + item.getData());
+				    if (log.isDebugEnabled()) {
+					    log.debug("Process event with content: " + item.getData());
+				    }				    
+			    }
+			    showTransaction(muleContext);
+			    
+
+    		} catch (RuntimeException | T24RuntimeException | T24EventPollingException e) {
 				throw new ConnectionException(ConnectionExceptionCode.CANNOT_REACH,"111",e.getMessage());
-			}
-        
+			} 
     	
-        return events;
+	    log.info("Exit @Processor method eventPool");
+
+	    return events;
     }
 
+
+    //Processor(intercepting = true)
+    //Summary("This method extracts messages from T24 server and implements Mule intercepting interface")
+    public Object eventPoolInterceptor(SourceCallback callback,  MuleEvent event, @MetaDataKeyParam String eventType, @Default("1") int batchSize) throws ConnectionException {
+    	List<T24Event> events;
+    	Object result = null;
+    	T24xaResourse t24xaResource = null;
+    	T24xaTransactionFactory txFactory = null;
+
+	    log.info("Enter @Processor(intercepting = true) callback method eventPoolInterceptor for event name: " + eventType + " and batchSize: "+ batchSize);
+    	
+    	try {
+    		
+    		pollService = EventPollingService.getInstance(config);
+    		
+    		batchSize = (batchSize < 1) ? 1 : batchSize;
+    		
+    		pollService.setEventType(eventType);
+    		pollService.setEventCount(batchSize);    		
+			
+    		t24xaResource = new T24xaResourse(pollService.getService(pollService.getEventType(), pollService.getEventCount()), pollService.getData());
+    		
+    		txFactory = (T24xaTransactionFactory) muleContext.getTransactionFactoryManager().getTransactionFactoryFor(T24xaResourse.class);
+    		
+    		events = txFactory.executeTransaction(muleContext, t24xaResource);
+
+    		log.info("T24 extracted messages size: " + events.size());
+		    for (T24Event item : events) {
+			    log.info("Process event with ID: " + item.getId());
+			    log.info("Process event with content: " + item.getData());
+			    if (log.isDebugEnabled()) {
+				    log.debug("Process event with content: " + item.getData());
+			    }				    
+		    }
+		    showTransaction(muleContext);
+		    showTransactionByType(muleContext, T24xaResourse.class);
+    		
+    		result = callback.process(events);
+
+    		log.info("Finish processing events list["+events.size()+"] with last event ID: " + (0 == events.size()? "none" : events.get(events.size()).getId()));
+    		
+    		txFactory.commit();
+    
+		}  catch (TransactionException e) {
+			if (null != txFactory) {
+				txFactory.rollback();
+			}
+			throw new ConnectionException(ConnectionExceptionCode.CANNOT_REACH,"111",e.getMessage());
+		} catch (Exception e) {
+			if (null != txFactory) {
+				txFactory.rollback();
+			}
+			throw new ConnectionException(ConnectionExceptionCode.UNKNOWN,"112","Problem in message processing: "+ e.getMessage());
+		}
+    
+	
+    return result;
+    	
+    }
+    
     /**
      *  Custom Message Source
      *
@@ -271,7 +320,7 @@ public class T24InboundConnector {
      *  @throws Exception error produced while processing the payload
      */
     @Source(sourceStrategy = SourceStrategy.POLLING,pollingPeriod=5000)
-    @Summary("This method extracts messages from T24 server with build in pooling")
+    @Summary("This method extracts messages from T24 server with build-in pooling in custom transactions scope")
     public void getMessage(SourceCallback callback,  String eventType, int batchSize) throws ConnectionException {
 
 
@@ -313,12 +362,19 @@ public class T24InboundConnector {
 		    		callback.process(event.getData());
 				    log.info("Finish processing event with ID: " + event.getId());
 				    
-				    showTransaction(muleContext);
-				    showTransactionByType(muleContext, T24xaResourse.class);
+			    	if (log.isDebugEnabled()) {
+					    showTransaction(muleContext);
+					    showTransactionByType(muleContext, T24xaResourse.class);
+			    	}
 			    }
 			    
 			    if (null != txFactory) {
-	        		txFactory.commit();
+			    	
+			    	if (log.isDebugEnabled()) {
+		                log.debug("Commit transaction: "+ txFactory.getCurrentTransaction());
+			    	}
+
+			    	txFactory.commit();
 			    }
 			    
 
@@ -335,13 +391,14 @@ public class T24InboundConnector {
     	
     	}catch(Exception e){
     		
-    		log.info("Result: " + response);
+    		log.trace("Result: " + response);
     		
     		throw new ConnectionException(ConnectionExceptionCode.UNKNOWN_HOST,"112", "Source processing exception! Name: "+ e.getMessage());
     	}
 
-    	log.info("Result: " + response);
+    	log.trace("Result: " + response);
         
+	    log.info("Exit @Source callback method getMessage");
     }
     
     
@@ -355,14 +412,14 @@ public class T24InboundConnector {
     		
     		if(null != txFactory) {
 
-    			log.info("Current transaction: " + txFactory.toString());
+    			log.debug("Current Mule transaction: " + txFactory.toString());
 
     		} else {
-    			log.info("Current transaction is null");
+    			log.debug("Current Mule transaction is missing");
     		}
         	
     	} else {
-    		log.info("Current transaction manager is null");
+    		log.debug("Current Mule transaction manager is missing");
     	}
     	
     }
@@ -377,21 +434,23 @@ public class T24InboundConnector {
         		transaction = mgr.getTransaction();
         		
         		if(null != transaction) {
-
-        			log.info("Current transaction: " + transaction.toString());
-        			log.info("  transaction class: " + transaction.getClass().getName());
-        			log.info("  transaction hcode: " + transaction.hashCode());
-        			log.info("  transaction status: " + transaction.getStatus());
+        			
+        			if (log.isDebugEnabled()) {
+            			log.debug("Current transaction: " + transaction.toString());
+            			log.debug("  transaction class: " + transaction.getClass().getName());
+            			log.debug("  transaction hcode: " + transaction.hashCode());
+            			log.debug("  transaction status: " + transaction.getStatus());
+        			}
 
         		} else {
-        			log.info("Current transaction is null");
+        			log.debug("Current Mule transaction is missing");
         		}
             	
         	} else {
-        		log.info("Current transaction manager is null");
+        		log.debug("Current Mule transaction manager is missing");
         	}
     	} catch (SystemException ex) {
-    		log.info("Cannot get transaction status. SystemException: " + ex.getMessage());
+    		log.debug("Cannot get transaction status. SystemException: " + ex.getMessage());
     		
     	}
     	
@@ -401,6 +460,7 @@ public class T24InboundConnector {
         log.error("Error while processing inbound messages", e);
         try {
             if (inboundProcessor != null) {
+                log.debug("Rollback transaction: "+ inboundProcessor.getCurrentTransaction());
                 inboundProcessor.rollback();
             }
         } catch (Exception f) {

@@ -10,10 +10,9 @@ public class FlowServiceTest {
 	public static void main(String[] args) throws ConnectionException {
 		ConnectorConfig cf = new ConnectorConfig();
 
-		cf.setPort(4447);
-		cf.setAgentUser("INPUTT");
-		cf.setAgentHost("localhost");
-		cf.testConnect("INPUTT", "123456", "http://localhost:9089/axis2/services/IntegrationFlowServiceWS?wsdl","GB0010001", "D:/Schemas/UserPass.txt");
+		cf.setServiceUserName("INPUTT");
+		cf.setServicePassword("123456");
+		cf.testConnect("http://localhost:9089/axis2/services/IntegrationFlowServiceWS?wsdl");
 	}
 
 }
