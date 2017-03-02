@@ -10,14 +10,16 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 import javax.xml.bind.DatatypeConverter;
 
-import com.temenos.adapter.oracle.BuildConfig;
 
 public class PasswdUtil {
+	
+    public static final String SECRET_SALT = "abcd1234";
+    public static final String SECRET_KEY = "abcdefghijklmnopqrstuvwxyz1234";
 
-    private static final char[] PASSWORD = BuildConfig.SECRET_KEY.toCharArray();
+    private static final char[] PASSWORD = SECRET_KEY.toCharArray();
     // "nTC3yGauHoGp/3.s/P558.KYEcFTrU".toCharArray();
 
-    private static final byte[] SALT = BuildConfig.SECRET_SALT.getBytes();
+    private static final byte[] SALT = SECRET_SALT.getBytes();
 
     /*{
         (byte) 0x1a, (byte) 0xaa, (byte) 0xaa, (byte) 0xa1,

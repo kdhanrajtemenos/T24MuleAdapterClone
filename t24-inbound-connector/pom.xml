@@ -56,52 +56,51 @@
 		
 		<!-- TEMENOS COMMON ADDAPTER -->
         <dependency>
-		      <groupId>t24.adapter.common</groupId>
-		      <artifactId>t24-adapter-common</artifactId>
-		      <version>1.0.2-SNAPSHOT</version>
+		    <groupId>com.temenos.technology.integrationframework</groupId>
+			<artifactId>t24-adapter-common</artifactId>
+			<version>DEV.0.0-SNAPSHOT</version>
 		</dependency>
 		
-		<!-- TEMENOS ORACLE SUPPORT 
-		<dependency>
+		<!-- TEMENOS ORACLE SUPPORT -->
+		<!-- <dependency>
 		      <groupId>com.temenos.technology.integrationframework.adapters.oracle</groupId>
 		      <artifactId>t24-oracle-adapter</artifactId>
 		      <version>DEV.0.0-SNAPSHOT</version>
-		</dependency>
-		-->
+		</dependency> -->		
 		
 		<!-- TEMENOS TAFJ SUPPORT -->
 		<dependency>
-		      <groupId>com.temenos.tafj</groupId>
-		      <artifactId>tComponentFramework</artifactId>
-		      <version>17.6.0-SNAPSHOT</version>
+		    <groupId>com.temenos.tafj</groupId>
+			<artifactId>tComponentFramework</artifactId>
+			<version>17.9.0</version>
 		</dependency>
 		
 		<!-- THIS IS EXTRNAL LOG4J -->
 		<dependency>
-			<groupId>org.apache.log4j</groupId>
-			<artifactId>org-apache-log4j</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.16</version>
 		</dependency>
 		
 		<!-- XSTREAM - XML BUILDER -->
 		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
-			<artifactId>com-thoughtworks-xstream</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<artifactId>xstream</artifactId>
+			<version>1.4.6</version>
 		</dependency>
 		
 		<!-- JREMOTE FOR TAFC -->
 		<dependency>
-			<groupId>com.jbase.jremote</groupId>
-			<artifactId>com-jbase-jremote</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<groupId>com.temenos</groupId>
+			<artifactId>jremote</artifactId>
+			<version>15.0.0.0</version>
 		</dependency>
 		
 		<!-- JBOSS CLIENT -->   	    
 		<dependency>
-		      <groupId>org.jboss</groupId>
-		      <artifactId>jboss-client-test</artifactId>
-		      <version>1.0.0</version>
+		    <groupId>org.jboss</groupId>
+            <artifactId>jboss-client</artifactId>
+            <version>7.2.0</version>
 		</dependency>
 		
 		<!-- https://mvnrepository.com/artifact/org.glassfish.jersey.bundles.repackaged/jersey-guava-->
@@ -113,22 +112,22 @@
 		
 		<!-- TEMENOS EJB SUPPORT  -->	  
 		<dependency>
-		      <groupId>com.temenos.t24.ifservice.ejb</groupId>
-		      <artifactId>com-temenos-t24-ifservice-ejb</artifactId>
-		      <version>1.0.1-SNAPSHOT</version>
+		      <groupId>com.temenos.t24.external.service.if_integrationframeworkservice.tafj</groupId>
+				<artifactId>t24-IF_IntegrationFrameworkService-t24service</artifactId>
+		      <version>DEV.0.0-SNAPSHOT</version>
 		</dependency> 
 		    
 		<!-- TEMENOS DATA SUPPORT -->   	  
 		<dependency>
-		      <groupId>com.temenos.t24.ifservice.data</groupId>
-		      <artifactId>com-temenos-t24-ifservice-data</artifactId>
-		      <version>1.0.1-SNAPSHOT</version>
+			<groupId>com.temenos.t24.external.service.eb_ofsconnectorservice.data</groupId>
+			<artifactId>t24-EB_OFSConnectorService-Data</artifactId>
+			<version>DEV.0.0-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
-			<groupId>com.temenos.tocf.common</groupId>
-			<artifactId>com-temenos-tocf-common</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<groupId>com.temenos.technology</groupId>
+			<artifactId>tocft24ra</artifactId>
+			<version>DEV.0.0-SNAPSHOT</version>
 		</dependency>
 		
 	</dependencies>

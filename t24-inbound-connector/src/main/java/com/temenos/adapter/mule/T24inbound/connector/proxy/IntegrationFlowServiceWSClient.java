@@ -3,9 +3,9 @@ package com.temenos.adapter.mule.T24inbound.connector.proxy;
 
 
 import org.mule.api.ConnectionException;
-import org.mule.modules.t24inbound.definition.GetAllFlowNamesResponse2;
-import org.mule.modules.t24inbound.definition.GetAllFlowSchemasResponse2;
-import org.mule.modules.t24inbound.definition.GetFlowSchemaResponse2;
+import org.mule.modules.t24inbound.definition.GetAllFlowNamesResponse;
+import org.mule.modules.t24inbound.definition.GetAllFlowSchemasResponse;
+import org.mule.modules.t24inbound.definition.GetFlowSchemaResponse;
 import org.mule.modules.t24inbound.definition.IntegrationFlowServiceWSPortType;
 import org.mule.modules.t24inbound.definition.T24UserDetails;
 
@@ -64,16 +64,16 @@ public class IntegrationFlowServiceWSClient {
 	/* Web methods: (Request-Response)  */
 	/* Each web-method invoked require T24UserDetails, and some other parameter */
 	/* For now just getVersions will be exposed..just for the test */
-	public GetAllFlowNamesResponse2 getAllFlowNames(T24UserDetails userDetails){
+	public GetAllFlowNamesResponse getAllFlowNames(T24UserDetails userDetails){
 		return port.getAllFlowNames(userDetails);
 	}
 	
 
-	public GetAllFlowSchemasResponse2 getAllFlowSchemas(T24UserDetails userDetails){
+	public GetAllFlowSchemasResponse getAllFlowSchemas(T24UserDetails userDetails){
 		return port.getAllFlowSchemas(userDetails);
 	}
 	
-	public GetFlowSchemaResponse2 getFlowSchema(T24UserDetails userDetails , String flowName){
+	public GetFlowSchemaResponse getFlowSchema(T24UserDetails userDetails , String flowName){
 		return port.getFlowSchema(userDetails, flowName);
 	}
 	

@@ -1,6 +1,7 @@
 package com.temenos.adapter.mule.T24inbound.connector.config;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Properties;
 
 //import javax.transaction.TransactionManager;
@@ -311,7 +312,9 @@ public class ConnectorConfig {
 	
 	/**
 	 * T24 company code used runtime, but have to cover the same parameter in design time method
-	 */
+	 * 
+	 * 
+
 	@Configurable
 	@Default("GB0010001")
 	@Placement(order = 3, group = "Connection", tab = "General")
@@ -324,6 +327,8 @@ public class ConnectorConfig {
 	public void setCoCode(String coCode) {
 		this.coCode = coCode;
 	}
+
+	 */
 	
 	/**
 	 * Sets the connector configuration file and location which is used to store the connection setting,
@@ -383,7 +388,7 @@ public class ConnectorConfig {
 		initIntegrationServiceFlow(serviceUrl+WS_NAME);
 		
 		//setWsConnectorUser(username, ui.getServicePassword(), coCode); 
-		setWsConnectorUser(serviceUserName, servicePassword, coCode); 
+		setWsConnectorUser(serviceUserName, servicePassword); 
 					
 		if(!isConnected()){ 
 			throw new ConnectionException(ConnectionExceptionCode.UNKNOWN_HOST,"112", "Can't connect to service!");
@@ -404,11 +409,14 @@ public class ConnectorConfig {
 			throw new ConnectionException(ConnectionExceptionCode.INCORRECT_CREDENTIALS,"114", "Failure in web service call with code: "+result);
 		}
 		
-		try{
-			ui.saveEncryptedFile(this);
-		}catch(RuntimeException exception){
-			throw new ConnectionException(ConnectionExceptionCode.CANNOT_REACH,"111","Cannot save file! File name: " + settingsFilePath + " Exception: "+ exception.getMessage());
-		}
+		
+		// remove configuration store in properties file
+
+//		try{
+//			ui.saveEncryptedFile(this);
+//		}catch(RuntimeException exception){
+//			throw new ConnectionException(ConnectionExceptionCode.CANNOT_REACH,"111","Cannot save file! File name: " + settingsFilePath + " Exception: "+ exception.getMessage());
+//		}
 
 		setConnectorMode(ConnectorOperationMode.DESIGN_TIME);
 		
@@ -425,16 +433,7 @@ public class ConnectorConfig {
 */
 	}
 	
-	private void splitFullFileName() {
-		// fill parsed settings file name and directory here
-        File file = new File(settingsFilePath);
-        if (file.isFile()) {
-        	setSettingsFolder(file.getParent());
-        	setSettingsFileName(file.getName());
-        }
-	}
-	
-	
+
 	// flag for single loading of configuration from property file
 	private boolean loadedFromFile = false;
 	
@@ -449,49 +448,9 @@ public class ConnectorConfig {
 		////Modified////
 		splitFullFileName();
 
-		UserCredentialsInterface ui = new UserCredentialsInterface();
-		Properties allProperties = ui.resolveCredentialFileAndPath(settingsFilePath); 
-		
-		if(null != allProperties && allProperties.contains(UserCredentialsInterface.T24_HOST)) { // Extract values from file
-			
-			log.info("Load configuration from file: "+settingsFilePath);
-			
-			String t24Host = allProperties.getProperty(UserCredentialsInterface.T24_HOST);
-			setT24Host(t24Host);
-			
-			String t24Port = allProperties.getProperty(UserCredentialsInterface.T24_PORT);
-			setT24Port(Integer.valueOf(t24Port));
+		// remove configuration from properties loading
 
-			String t24serverType = allProperties.getProperty(UserCredentialsInterface.T24_SERVER_TYPE);
-			this.setT24RunTime(RuntimeConfigServerSelector.valueOf(t24serverType));
-			
-			String t24runtime = allProperties.getProperty(UserCredentialsInterface.T24_RUNTIME);
-			RuntimeConfigSelector agentType = RuntimeConfigSelector.valueOf(t24runtime);
-			
-			String t24User = allProperties.getProperty(UserCredentialsInterface.T24_USER);
-			setT24User(t24User);
-			
-			String folder = allProperties.getProperty(UserCredentialsInterface.FOLDER);
-			setSettingsFolder(folder);
-			
-			String nodeNames  = allProperties.getProperty(UserCredentialsInterface.T24_NODE_NAMES);
-			setNodeName(nodeNames);
-			
-			String t24password = allProperties.getProperty(UserCredentialsInterface.T24_PASS);
-			setT24Password(t24password);
-			
-
-			String stateful = allProperties.getProperty(UserCredentialsInterface.T24_EJB_STATEFUL);
-			setEjbStateful(Boolean.valueOf(stateful));
-
-			String ejbName = allProperties.getProperty(UserCredentialsInterface.T24_EJB_NAME);
-			if(null == ejbName) {
-				ejbName = "";
-			}
-			setT24Password(ejbName);
-
-		}
-		
+//		loadConfigurationFromProperties();
 		loadedFromFile = false;
 		
 		
@@ -505,7 +464,7 @@ public class ConnectorConfig {
 //		}
 
 		//setWsConnectorUser(username, ui.getServicePassword(), coCode); 
-		setWsConnectorUser(serviceUserName, servicePassword, coCode); 		
+		setWsConnectorUser(serviceUserName, servicePassword); 		
 		
 		/////HERE IS THE PLACE FOR T24
 		//setT24password( ui.getT24password());
@@ -578,17 +537,77 @@ public class ConnectorConfig {
      * @param password - SOAP client password
      * @param coCode  - company code
      */
-    private void setWsConnectorUser(String username, String password, String coCode){
+    private void setWsConnectorUser(String username, String password){
     	ObjectFactory jaxbFactory = new ObjectFactory();
 		userWsDeatils = new T24UserDetails();
-		userWsDeatils.setCoCode(jaxbFactory.createT24UserDetailsCoCode(coCode));
 		userWsDeatils.setPassword(jaxbFactory.createT24UserDetailsPassword(password));
 		userWsDeatils.setUser(jaxbFactory.createT24UserDetailsUser(username));
     }
     
+	private void splitFullFileName() {
+		// fill parsed settings file name and directory here
+        File file = new File(settingsFilePath);
+        
+        // check for existing file and create if missing to fix schema loading
+        if ( ! file.exists() ) {
+            try {
+    			file.createNewFile();
+    		} catch (IOException e) {
+    			// TODO Auto-generated catch block
+    			//e.printStackTrace();
+    		}
+        }
+        
+        if (file.isFile()) {
+        	setSettingsFolder(file.getParent());
+        	setSettingsFileName(file.getName());
+        }
+	}
+	
+	@SuppressWarnings("unused")
+	private void loadConfigurationFromProperties() {
+		UserCredentialsInterface ui = new UserCredentialsInterface();
+		Properties allProperties = ui.resolveCredentialFileAndPath(settingsFilePath); 
+		
+		if(null != allProperties && allProperties.contains(UserCredentialsInterface.T24_HOST)) { // Extract values from file
+			
+			log.info("Load configuration from file: "+settingsFilePath);
+			
+			String t24Host = allProperties.getProperty(UserCredentialsInterface.T24_HOST);
+			setT24Host(t24Host);
+			
+			String t24Port = allProperties.getProperty(UserCredentialsInterface.T24_PORT);
+			setT24Port(Integer.valueOf(t24Port));
 
+			String t24serverType = allProperties.getProperty(UserCredentialsInterface.T24_SERVER_TYPE);
+			this.setT24RunTime(RuntimeConfigServerSelector.valueOf(t24serverType));
+			
+			String t24runtime = allProperties.getProperty(UserCredentialsInterface.T24_RUNTIME);
+			RuntimeConfigSelector agentType = RuntimeConfigSelector.valueOf(t24runtime);
+			
+			String t24User = allProperties.getProperty(UserCredentialsInterface.T24_USER);
+			setT24User(t24User);
+			
+			String folder = allProperties.getProperty(UserCredentialsInterface.FOLDER);
+			setSettingsFolder(folder);
+			
+			String nodeNames  = allProperties.getProperty(UserCredentialsInterface.T24_NODE_NAMES);
+			setNodeName(nodeNames);
+			
+			String t24password = allProperties.getProperty(UserCredentialsInterface.T24_PASS);
+			setT24Password(t24password);
+			
 
+			String stateful = allProperties.getProperty(UserCredentialsInterface.T24_EJB_STATEFUL);
+			setEjbStateful(Boolean.valueOf(stateful));
 
-    
+			String ejbName = allProperties.getProperty(UserCredentialsInterface.T24_EJB_NAME);
+			if(null == ejbName) {
+				ejbName = "";
+			}
+			setEjbName(ejbName);
 
+		}
+	}
+	
 }

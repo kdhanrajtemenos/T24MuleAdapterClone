@@ -5,6 +5,9 @@ package com.temenos.adapter.mule.T24inbound.connector.rmi;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.temenos.adapter.common.conf.T24InvalidConfigurationException;
 import com.temenos.adapter.common.conf.T24RuntimeConfiguration;
 import com.temenos.adapter.common.runtime.T24RuntimeException;
@@ -19,6 +22,7 @@ import com.temenos.adapter.mule.T24inbound.connector.config.ConnectorConfig;
 
 public class EventPollingService {
 	
+    protected final transient Log log = LogFactory.getLog(getClass());
 	
 	private static EventPollingService instance;
 	
@@ -45,11 +49,36 @@ public class EventPollingService {
 	       
 	}
 	
+	private EventPollingService(String eventType, int eventCount, ConnectorConfig config) {
+		this.eventType = eventType;
+		this.eventCount = eventCount;
+		this.config = config;
+	}
+	
+
 	/**
-	 * This is singletone
-	 * @param config
-	 * @param i 
+	 * This is singleton
 	 * @param eventType 
+	 * @param eventCount 
+	 * @param config
+	 * @return
+	 */
+	public static EventPollingService getInstance(String eventType, int eventCount, ConnectorConfig config){
+		
+		if (instance == null) {
+			synchronized (EventPollingService.class) {
+				if (instance == null) {
+
+					instance = new EventPollingService(eventType, eventCount, config).init();
+				}
+			}
+		}
+		return instance;
+	}
+	
+	/**
+	 * This is singleton
+	 * @param config
 	 * @return
 	 */
 	public static EventPollingService getInstance(ConnectorConfig config){
@@ -66,7 +95,7 @@ public class EventPollingService {
 	}
 	
 	/**
-	 * Some initializtion of the singleton
+	 * Some initialization of the singleton
 	 * @param i 
 	 * @param eventType 
 	 * @param config
@@ -74,8 +103,6 @@ public class EventPollingService {
 	 * @throws RuntimeException
 	 */
 	private EventPollingService init() throws RuntimeException {
-		
-
 		
 		ArrayList<String> hosts = new ArrayList<String>();
 	    ArrayList<Integer> ports = new ArrayList<Integer>();
@@ -90,7 +117,7 @@ public class EventPollingService {
 			configT24 = TAFJRuntimeConfigurationBuilder.createTAFJRuntimeConfiguration(
 			        TafjServerType.JBOSS_7_2.toString(),
 			        hosts, ports, nodes, config.getT24User(), 
-			        config.getT24Password(), true, "");
+			        config.getT24Password(), config.getEjbStateful(), "");
 		} catch (T24InvalidConfigurationException e) {
 			throw new RuntimeException("T24 configuration error: " + e.getMessage());
 		}
@@ -102,26 +129,33 @@ public class EventPollingService {
     T24EventPollingService service = null;
 	
     
+	@SuppressWarnings("deprecation")
 	public List<T24Event> getT24Events(String eventType, int i) throws RuntimeException, T24RuntimeException, T24EventPollingException {
+    	log.info("Enter EventPollingService.getT24Events for event " + eventType + " size " + i);
 	 
 		setEventType(eventType);
 		setEventCount(i);
 		
-		List<String> comp = new ArrayList<String>();
-		comp.add(config.getUserWsDeatils().getCoCode().getValue());
-		this.data = EventPollingData.newInstance(eventType, i, comp);
+//		List<String> comp = new ArrayList<String>();
+//		comp.add(config.getUserWsDeatils().getCoCode().getValue());
+//		this.data = EventPollingData.newInstance(eventType, i, comp);
+		this.data = EventPollingData.newInstance(eventType, i);
 
-	    T24InboundServiceProvider provider = T24InboundServiceProviderFactory.getServiceProvider(configT24);
+	    //T24InboundServiceProvider provider = T24InboundServiceProviderFactory.getServiceProvider(configT24);
+		// use deprecated method to eliminate company name
+	    T24InboundServiceProvider provider = T24InboundServiceProviderFactory.getServiceProvider(eventType, i, configT24);
 	    
 		List<T24Event> result = null;
 		
 		try {
 			
-			service = provider.getService(data);
+			//service = provider.getService(data);
+			// use deprecated method to eliminate company name
+			service = provider.getService();
 	
 			service.begin();
 			    
-			result =  service.execute(data);
+			result =  service.execute();
 
 		    service.commit();
 
@@ -146,21 +180,21 @@ public class EventPollingService {
 	    return result;
 	}
 	
+	@SuppressWarnings("deprecation")
 	public T24EventPollingService getService(String eventType, int i) {
 		
 		setEventType(eventType);
 		setEventCount(i);
-		List<String> comp = new ArrayList<String>();
-		comp.add(config.getUserWsDeatils().getCoCode().getValue());
-		this.data = EventPollingData.newInstance(eventType, i, comp);
-
-	    
-
+//		List<String> comp = new ArrayList<String>();
+//		comp.add(config.getUserWsDeatils().getCoCode().getValue());
+		this.data = EventPollingData.newInstance(eventType, i);
 	    	
-	    T24InboundServiceProvider provider = T24InboundServiceProviderFactory.getServiceProvider(configT24);
+	    //T24InboundServiceProvider provider = T24InboundServiceProviderFactory.getServiceProvider(configT24);
+	    T24InboundServiceProvider provider = T24InboundServiceProviderFactory.getServiceProvider(eventType, i, configT24);
 	    
 	    try {
-			service = provider.getService(data);
+			//service = provider.getService(data);
+			service = provider.getService();
 		} catch (T24RuntimeException e) {
 			e.printStackTrace();
 		}
@@ -186,33 +220,26 @@ public class EventPollingService {
 	
 	private boolean readyToCommit = false;
 
+	@SuppressWarnings("deprecation")
 	public void beginExecution(String eventType, int i) {
 		
 		setEventType(eventType);
 		setEventCount(i);
 		
-		List<String> comp = new ArrayList<String>();
-		comp.add(config.getUserWsDeatils().getCoCode().getValue());
-		this.data = EventPollingData.newInstance(eventType, i, comp);
+//		List<String> comp = new ArrayList<String>();
+//		comp.add(config.getUserWsDeatils().getCoCode().getValue());
+		this.data = EventPollingData.newInstance(eventType, i);
 
-	    
-
-	    	
-	    T24InboundServiceProvider provider = T24InboundServiceProviderFactory.getServiceProvider(configT24);
-	    	/*
-	    	try {
-	    		T24EventPollingService service = provider.getService(data);
-			} catch (T24RuntimeException e) {
-				throw new RuntimeException("Cannot get T24 Service: " + e.getMessage());
-			}
-			*/
+	    //T24InboundServiceProvider provider = T24InboundServiceProviderFactory.getServiceProvider(configT24);
+	    T24InboundServiceProvider provider = T24InboundServiceProviderFactory.getServiceProvider(eventType, i, configT24);
 
 	    errorExecution = 0;
 	    readyToCommit = false;
 		
 		try{
 			
-			service = provider.getService(data);
+			//service = provider.getService(data);
+			service = provider.getService();
 			
 			//service.begin();
 			
@@ -298,9 +325,9 @@ public class EventPollingService {
 
 	public EventPollingData getData() {
 		if(data==null){
-			List<String> comp = new ArrayList<String>();
-			comp.add(config.getUserWsDeatils().getCoCode().getValue());
-			this.data = EventPollingData.newInstance(eventType, eventCount, comp);
+//			List<String> comp = new ArrayList<String>();
+//			comp.add(config.getUserWsDeatils().getCoCode().getValue());
+			this.data = EventPollingData.newInstance(eventType, eventCount);
 		}
 		return data;
 	}

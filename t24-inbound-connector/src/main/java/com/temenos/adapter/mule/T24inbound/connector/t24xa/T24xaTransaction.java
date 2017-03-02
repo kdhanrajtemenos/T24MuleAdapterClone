@@ -82,7 +82,12 @@ public class T24xaTransaction extends AbstractSingleResourceTransaction {
 			 super.bindResource(JTAUtils.TRANSACTION_RSOURSE_TYPE, resource);
 			 logger.debug("Exceuting  JTA transaction: " + super.getId());
 			 */
-			 events = t24xaResourse.getService().execute(t24xaResourse.getData());
+						
+			 //events = t24xaResourse.getService().execute(t24xaResourse.getData());
+			
+			 // use no parameters execute
+			 events = t24xaResourse.getService().execute();
+			 
 		} catch (T24EventPollingException e) {
 
 			throw new T24xaException(e.getMessage());

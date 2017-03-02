@@ -1,13 +1,8 @@
 package com.temenos.adapter.mule.T24inbound.connector;
 
 
-
-import java.util.ArrayList;
 import java.util.Date;
-
-//import java.util.ArrayList;
 import java.util.List;
-
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -18,18 +13,11 @@ import javax.transaction.TransactionManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
-//import javax.transaction.TransactionManager;
-
-
-
 import org.mule.api.ConnectionException;
 import org.mule.api.ConnectionExceptionCode;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleEvent;
 import org.mule.api.SingleResourceTransactionFactoryManager;
-//import org.mule.api.MuleEvent;
-//import org.mule.api.MuleEvent;
 import org.mule.api.annotations.Config;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.MetaDataScope;
@@ -43,8 +31,6 @@ import org.mule.api.callback.SourceCallback;
 import org.mule.api.config.MuleProperties;
 import org.mule.api.context.notification.TransactionNotificationListener;
 
-import org.mule.api.transaction.TransactionException;
-
 import org.mule.api.context.notification.ExceptionNotificationListener;
 import org.mule.context.notification.ExceptionNotification;
 
@@ -53,7 +39,6 @@ import org.mule.context.notification.TransactionNotification;
 import com.temenos.adapter.common.runtime.T24RuntimeException;
 import com.temenos.adapter.common.runtime.inbound.T24Event;
 import com.temenos.adapter.common.runtime.inbound.T24EventPollingException;
-//import com.temenos.adapter.common.runtime.inbound.T24EventPollingService;
 import com.temenos.adapter.mule.T24inbound.connector.config.ConnectorConfig;
 import com.temenos.adapter.mule.T24inbound.connector.datasense.DataSenseResolver;
 import com.temenos.adapter.mule.T24inbound.connector.rmi.EventPollingService;
@@ -81,10 +66,9 @@ public class T24InboundConnector {
         this.config = config;
     }
     
-   // private InboundMetadataModel dummyModel;
-    
     private EventPollingService pollService = null;
 
+    T24xaResourse t24xaResource = null;
 
 	@Inject
     private MuleContext muleContext;
@@ -96,16 +80,10 @@ public class T24InboundConnector {
     	//**
        	muleContext.getTransactionFactoryManager().registerTransactionFactory(T24xaResourse.class, new T24xaTransactionFactory());
        	
-    	try{
-    		//pollService = EventPollingService.getInstance(config);
-    		
-    		//t24xaResource = new T24xaResourse(pollService.getService(eventType, 1), pollService.getData());
-    		
+    	try {
+
     		pollService = EventPollingService.getInstance(config);
     		
-    		//t24xaResource = new T24xaResourse();
-    		
-        	//muleContext.getRegistry().registerObject(T24xaUtils.TRANSACTION_RSOURSE_TYPE, t24xaResource);
         } catch (Exception re) {
         	log.warn("XA context injections processor already registered.");
         }
@@ -114,18 +92,19 @@ public class T24InboundConnector {
     
    
     public void setMuleContext(final MuleContext muleContext) { 
+    	
     	this.muleContext = muleContext; 
-    	//MuleContext context = eventM.getMuleContext();
 
     	try {
     		//If this is null we need wrapper object
     		final TransactonNotifiactionWrapper transactonNotifiactionService = new TransactonNotifiactionWrapper();
     		
-    		TransactionNotificationListener<TransactionNotification> transactonListener = new TransactionNotificationListener<TransactionNotification>() 
-			{
+    		TransactionNotificationListener<TransactionNotification> transactonListener = 
+    				new TransactionNotificationListener<TransactionNotification>() 
+
+    		{
 				
-				
-				// It seems the first notification comes after first invokation of processor method //
+				// It seems the first notification comes after first invocation of processor method //
 
 				@Override
 				public void onNotification(TransactionNotification notif) { // TransactionNotification / ServerNotification
@@ -172,22 +151,11 @@ public class T24InboundConnector {
 					log.info("	ExceptionNotificationListener ExceptionStringId: " + actionId);						
 			    	log.info("	ExceptionNotificationListener Timestamp: " + new Date(notification.getTimestamp()));
 			    	
-					
-					Throwable t =  notification.getException();
-					
-					//muleContext.getTransactionManager().getTransaction().getStatus();
-//					if( t instanceof Exception ){
-//						transactonNotifiactionService.getService().rollBackExecution();
-//					}
-//					else if( t instanceof RuntimeException ){
-//						transactonNotifiactionService.getService().rollBackExecution();
-//					}
-					
 				}
 		    	
 		    };
 		    
-			muleContext.registerListener(transactonListener);  //only Exceception Listener left
+			muleContext.registerListener(transactonListener);  
 			muleContext.registerListener(exceptionListner);
 			
     		
@@ -197,11 +165,6 @@ public class T24InboundConnector {
 
     }
     
-    
-
-    //TransactionManager txMngr = null;
-    
-    T24xaResourse t24xaResource = null;
     
     public static final String SOURCE_MESSAGE_PROCESSOR_PROPERTY_NAME = MuleProperties.ENDPOINT_PROPERTY_PREFIX + "sourceMessageProcessor";
     
@@ -214,72 +177,12 @@ public class T24InboundConnector {
 	    log.info("Enter @Processor method eventPool for event name: " + eventType + " and batchSize: "+ batchSize);
 
         	
-//        	try {
-        		
-        		pollService = EventPollingService.getInstance(config);
-				
-//        		T24xaResourse t24xaResource = new T24xaResourse(pollService.getService(pollService.getEventType(), pollService.getEventCount()), pollService.getData());
-//        		
-//        		T24xaTransactionFactory txFactory = (T24xaTransactionFactory) muleContext.getTransactionFactoryManager().getTransactionFactoryFor(T24xaResourse.class);
-//        		
-//        		events = txFactory.executeTransaction(muleContext, t24xaResource);
-//        		
-//        		//txFactory.commit();
-//        
-//			}  catch (TransactionException e) {
-//				throw new ConnectionException(ConnectionExceptionCode.CANNOT_REACH,"111",e.getMessage());
-//			}
-
-    		try {
-    			events = pollService.getT24Events(eventType, batchSize);
-
-    			log.info("T24 extracted messages size: " + events.size());
-			    for (T24Event item : events) {
-				    log.info("Process event with ID: " + item.getId());
-				    log.info("Process event with content: " + item.getData());
-				    if (log.isDebugEnabled()) {
-					    log.debug("Process event with content: " + item.getData());
-				    }				    
-			    }
-			    showTransaction(muleContext);
-			    
-
-    		} catch (RuntimeException | T24RuntimeException | T24EventPollingException e) {
-				throw new ConnectionException(ConnectionExceptionCode.CANNOT_REACH,"111",e.getMessage());
-			} 
-    	
-	    log.info("Exit @Processor method eventPool");
-
-	    return events;
-    }
-
-
-    //Processor(intercepting = true)
-    //Summary("This method extracts messages from T24 server and implements Mule intercepting interface")
-    public Object eventPoolInterceptor(SourceCallback callback,  MuleEvent event, @MetaDataKeyParam String eventType, @Default("1") int batchSize) throws ConnectionException {
-    	List<T24Event> events;
-    	Object result = null;
-    	T24xaResourse t24xaResource = null;
-    	T24xaTransactionFactory txFactory = null;
-
-	    log.info("Enter @Processor(intercepting = true) callback method eventPoolInterceptor for event name: " + eventType + " and batchSize: "+ batchSize);
-    	
-    	try {
-    		
-    		pollService = EventPollingService.getInstance(config);
-    		
-    		batchSize = (batchSize < 1) ? 1 : batchSize;
-    		
-    		pollService.setEventType(eventType);
-    		pollService.setEventCount(batchSize);    		
+		pollService = EventPollingService.getInstance(config);
 			
-    		t24xaResource = new T24xaResourse(pollService.getService(pollService.getEventType(), pollService.getEventCount()), pollService.getData());
-    		
-    		txFactory = (T24xaTransactionFactory) muleContext.getTransactionFactoryManager().getTransactionFactoryFor(T24xaResourse.class);
-    		
-    		events = txFactory.executeTransaction(muleContext, t24xaResource);
+		try {
+			events = pollService.getT24Events(eventType, batchSize);
 
-    		log.info("T24 extracted messages size: " + events.size());
+			log.info("T24 extracted messages size: " + events.size());
 		    for (T24Event item : events) {
 			    log.info("Process event with ID: " + item.getId());
 			    log.info("Process event with content: " + item.getData());
@@ -288,33 +191,20 @@ public class T24InboundConnector {
 			    }				    
 		    }
 		    showTransaction(muleContext);
-		    showTransactionByType(muleContext, T24xaResourse.class);
-    		
-    		result = callback.process(events);
+		    
 
-    		log.info("Finish processing events list["+events.size()+"] with last event ID: " + (0 == events.size()? "none" : events.get(events.size()).getId()));
-    		
-    		txFactory.commit();
-    
-		}  catch (TransactionException e) {
-			if (null != txFactory) {
-				txFactory.rollback();
-			}
+		} catch (RuntimeException | T24RuntimeException | T24EventPollingException e) {
 			throw new ConnectionException(ConnectionExceptionCode.CANNOT_REACH,"111",e.getMessage());
-		} catch (Exception e) {
-			if (null != txFactory) {
-				txFactory.rollback();
-			}
-			throw new ConnectionException(ConnectionExceptionCode.UNKNOWN,"112","Problem in message processing: "+ e.getMessage());
-		}
-    
-	
-    return result;
+		} 
     	
+	    log.info("Exit @Processor method eventPool");
+
+	    return events;
     }
-    
+
+
     /**
-     *  Custom Message Source
+     *  Source processing of messages to support transaction wrapping and batch processing
      *
      *  @param callback The source callback used to dispatch message to the flow
      *  @throws Exception error produced while processing the payload
@@ -330,16 +220,17 @@ public class T24InboundConnector {
 	    List<T24Event> events;
 	    T24xaResourse t24xaResource;
 	    T24xaTransactionFactory txFactory = null;
+
+	    // fix bad size
+	    batchSize = (batchSize < 1) ? 1 : batchSize;
     	
     	try {
 
-	    	pollService = EventPollingService.getInstance(config);
+	    	pollService = EventPollingService.getInstance(eventType, batchSize, config);
 	    	
 	    	
 	    	try {
 	    	
-	    		batchSize = (batchSize < 1) ? 1 : batchSize;
-	    		
 	    		pollService.setEventType(eventType);
 	    		pollService.setEventCount(batchSize);
 
