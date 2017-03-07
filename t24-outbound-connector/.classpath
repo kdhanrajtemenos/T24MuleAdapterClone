@@ -73,7 +73,6 @@
   <classpathentry kind="var" path="M2_REPO/com/github/stephenc/eaio-grabbag/grabbag/1.8.1/grabbag-1.8.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-cli/commons-cli/1.2/commons-cli-1.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-io/commons-io/2.4/commons-io-2.4.jar"/>
-  <classpathentry kind="var" path="M2_REPO/commons-lang/commons-lang/2.4/commons-lang-2.4.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-pool/commons-pool/1.6/commons-pool-1.6.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/geronimo/specs/geronimo-jta_1.1_spec/1.1.1/geronimo-jta_1.1_spec-1.1.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/geronimo/specs/geronimo-j2ee-connector_1.5_spec/2.0.0/geronimo-j2ee-connector_1.5_spec-2.0.0.jar"/>
@@ -158,7 +157,7 @@
   <classpathentry kind="var" path="M2_REPO/org/aspectj/aspectjrt/1.8.5/aspectjrt-1.8.5.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/ant/ant/1.7.0/ant-1.7.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/ant/ant-launcher/1.7.0/ant-launcher-1.7.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-lang3/3.3.2/commons-lang3-3.3.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-lang3/3.3.2/commons-lang3-3.3.2.jar" sourcepath="M2_REPO/org/apache/commons/commons-lang3/3.3.2/commons-lang3-3.3.2-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/temenos/technology/integrationframework/t24-adapter-common/DEV.0.0-SNAPSHOT/t24-adapter-common-DEV.0.0-SNAPSHOT.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/temenos/tafj/tComponentFramework/17.9.0/tComponentFramework-17.9.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/temenos/tafj/TAFJCommon/17.9.0/TAFJCommon-17.9.0.jar"/>
