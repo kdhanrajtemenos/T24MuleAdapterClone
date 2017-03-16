@@ -35,7 +35,7 @@ public class SingleOfsmlTestCases  {
 	
 
 	@Test
-	public void verifyOfsml() {
+	public void verifyOfsml() throws ConnectionException {
 		Properties resource  = initConfig.readResourse(InitConnectorConfig.OFSML_TEST);
 		String singleOfsmlRequest  = resource.getProperty(InitConnectorConfig.REQUEST);
 		String expectedResponse = resource.getProperty(InitConnectorConfig.RESPONSE);

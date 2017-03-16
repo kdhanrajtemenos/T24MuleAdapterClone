@@ -46,7 +46,7 @@ public class T24OutboundConnector {
 	 */
 	@Processor
 	@Summary("This processor assumes that input data is formatated as T24 Singel OFS request string")
-	public String singleOfs(@Default("#[message.payload]") String singleOfsRequest) {
+	public String singleOfs(@Default("#[message.payload]") String singleOfsRequest) throws ConnectionException {
 		log.info("Call singleOfs processor");
 		return genericRequestProccessing(singleOfsRequest, RequestType.SINGLE_OFS, null);
 	}
@@ -60,7 +60,7 @@ public class T24OutboundConnector {
 	 */
 	@Processor
 	@Summary("This processor assumes that input data is formatated as T24 Batch OFS request string")
-	public String batchOfs(@Default("#[message.payload]") String batchOfsRequest) {
+	public String batchOfs(@Default("#[message.payload]") String batchOfsRequest) throws ConnectionException {
 		log.info("Call batchOfs processor");
 		return genericRequestProccessing(batchOfsRequest, RequestType.BATCH_OFS, null);
 	}
@@ -74,7 +74,7 @@ public class T24OutboundConnector {
 	 */
 	@Processor
 	@Summary("This processor assumes that input data is formatated as T24 Singel OFSML request string")
-	public String singleOfsml(@Default("#[message.payload]") String singleOfsmlRequest) {
+	public String singleOfsml(@Default("#[message.payload]") String singleOfsmlRequest) throws ConnectionException {
 		log.info("Call singleOfsml processor");
 		return genericRequestProccessing(singleOfsmlRequest, RequestType.SINGLE_OFSML, null);
 	}
@@ -88,7 +88,7 @@ public class T24OutboundConnector {
 	 */
 	@Processor
 	@Summary("This processor assumes that input data is formatated as T24 Batch OFSML request string")
-	public String batchOfsml(@Default("#[message.payload]") String batchOfsmlRequest) {
+	public String batchOfsml(@Default("#[message.payload]") String batchOfsmlRequest) throws ConnectionException {
 		log.info("Call batchOfsml processor");
 		return genericRequestProccessing(batchOfsmlRequest, RequestType.BATCH_OFSML, null);
 	}
@@ -102,7 +102,7 @@ public class T24OutboundConnector {
 	 */
 	@Processor
 	@Summary("This processor assumes that input data is formatated as T24 Custom XML request string")
-	public String serviceXml(@MetaDataKeyParam String serviceName, @Default("#[message.payload]") String xmlRequest) {
+	public String serviceXml(@MetaDataKeyParam String serviceName, @Default("#[message.payload]") String xmlRequest) throws ConnectionException {
 		log.info("Call serviceXml processor for service name: "+serviceName);
 		if (selectedXmlMetaData == null) {
 			selectedXmlMetaData = (new T24OutboundRunTimeMetaDataExtractor(config))
@@ -124,14 +124,16 @@ public class T24OutboundConnector {
 	 * @return java.lang.String - the response as string
 	 * @throws ConnectionException
 	 */
-	private String genericRequestProccessing(String request, RequestType type, T24ServiceXmlMetadataImpl xmlMetaData) {
+	private String genericRequestProccessing(String request, RequestType type, T24ServiceXmlMetadataImpl xmlMetaData) throws ConnectionException {
 		String responce = null;
-		try {
+//		try {
+
 			log.info("Call genericRequestProccessing in "+this.getClass());
 			responce = config.getOutBoundConnection().ejbConnectionRepsonse(request, type, xmlMetaData);
-		} catch (ConnectionException ex) {
-			ex.printStackTrace();
-		}
+
+//		} catch (ConnectionException ex) {
+//			ex.printStackTrace();
+//		}
 		return responce;
 	}
 

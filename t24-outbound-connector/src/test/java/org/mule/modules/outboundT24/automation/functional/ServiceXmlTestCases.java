@@ -38,7 +38,7 @@ public class ServiceXmlTestCases  {
 	}
 
 	@Test
-	public void verify() {
+	public void verify() throws ConnectionException {
 		Properties resource  = initConfig.readResourse(InitConnectorConfig.SERVICE_XML_TEST);
 		String operation = resource.getProperty(InitConnectorConfig.OPERATION);
 		String request = resource.getProperty(InitConnectorConfig.REQUEST);

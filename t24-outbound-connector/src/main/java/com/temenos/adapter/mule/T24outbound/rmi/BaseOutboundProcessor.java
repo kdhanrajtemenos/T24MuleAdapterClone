@@ -3,7 +3,6 @@ package com.temenos.adapter.mule.T24outbound.rmi;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Logger;
 
 import com.temenos.adapter.common.conf.T24RuntimeConfiguration;
 import com.temenos.adapter.common.runtime.T24RuntimeException;

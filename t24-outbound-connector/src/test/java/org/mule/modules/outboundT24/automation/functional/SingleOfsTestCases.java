@@ -35,7 +35,7 @@ public class SingleOfsTestCases {
 	
 
 	@Test
-	public void verifyOfs() {
+	public void verifyOfs() throws ConnectionException {
 		Properties resource  = initConfig.readResourse(InitConnectorConfig.OFS_TEST);
 		String singleOfsRequest  = resource.getProperty(InitConnectorConfig.REQUEST);
 		String expectedResponse = resource.getProperty(InitConnectorConfig.RESPONSE);

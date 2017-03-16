@@ -34,7 +34,7 @@ public class BatchOfsmlTestCases  {
 	
 
 	@Test
-	public void verifyBatchOfs() {
+	public void verifyBatchOfs() throws ConnectionException {
 		Properties resource  = initConfig.readResourse(InitConnectorConfig.BATCH_OFSML_TEST);
 		String singleBatchOfsmlRequest  = resource.getProperty(InitConnectorConfig.REQUEST);
 		String expectedResponse = resource.getProperty(InitConnectorConfig.RESPONSE);
