@@ -2,6 +2,7 @@
 <classpath>
   <classpathentry kind="src" path="src/test/java" output="target/test-classes" including="**/*.java"/>
   <classpathentry kind="src" path="src/test/resources" output="target/test-classes" excluding="**/*.java"/>
+  <classpathentry kind="src" path="src/main/app" output="target/test-classes" excluding="**/*.java"/>
   <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
   <classpathentry kind="src" path="target/generated-sources/cxf" including="**/*.java"/>
   <classpathentry kind="src" path="target/generated-sources/mule"/>
@@ -73,6 +74,7 @@
   <classpathentry kind="var" path="M2_REPO/com/github/stephenc/eaio-grabbag/grabbag/1.8.1/grabbag-1.8.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-cli/commons-cli/1.2/commons-cli-1.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-io/commons-io/2.4/commons-io-2.4.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-lang/commons-lang/2.4/commons-lang-2.4.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-pool/commons-pool/1.6/commons-pool-1.6.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/geronimo/specs/geronimo-jta_1.1_spec/1.1.1/geronimo-jta_1.1_spec-1.1.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/geronimo/specs/geronimo-j2ee-connector_1.5_spec/2.0.0/geronimo-j2ee-connector_1.5_spec-2.0.0.jar"/>
@@ -157,8 +159,7 @@
   <classpathentry kind="var" path="M2_REPO/org/aspectj/aspectjrt/1.8.5/aspectjrt-1.8.5.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/ant/ant/1.7.0/ant-1.7.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/ant/ant-launcher/1.7.0/ant-launcher-1.7.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-lang3/3.3.2/commons-lang3-3.3.2.jar" sourcepath="M2_REPO/org/apache/commons/commons-lang3/3.3.2/commons-lang3-3.3.2-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/temenos/technology/integrationframework/t24-adapter-common/DEV.0.0-SNAPSHOT/t24-adapter-common-DEV.0.0-SNAPSHOT.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/temenos/technology/integrationframework/t24-adapter-common/201702.0.0/t24-adapter-common-201702.0.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/temenos/tafj/tComponentFramework/17.9.0/tComponentFramework-17.9.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/temenos/tafj/TAFJCommon/17.9.0/TAFJCommon-17.9.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/temenos/tafj/TAFJLogging/17.9.0/TAFJLogging-17.9.0.jar"/>
@@ -214,10 +215,11 @@
   <classpathentry kind="var" path="M2_REPO/org/mockito/mockito-all/1.9.5/mockito-all-1.9.5.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/geronimo/specs/geronimo-j2ee-connector_1.6_spec/1.0/geronimo-j2ee-connector_1.6_spec-1.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/jboss-client/7.2.0/jboss-client-7.2.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/temenos/t24/external/service/eb_ofsconnectorservice/ejb/tafj/t24-EB_OFSConnectorService-ejb/DEV.0.0-SNAPSHOT/t24-EB_OFSConnectorService-ejb-DEV.0.0-SNAPSHOT.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/temenos/t24/external/service/eb_ofsconnectorservice/data/t24-EB_OFSConnectorService-Data/DEV.0.0-SNAPSHOT/t24-EB_OFSConnectorService-Data-DEV.0.0-SNAPSHOT.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/temenos/technology/ofsml/DEV.0.0-SNAPSHOT/ofsml-DEV.0.0-SNAPSHOT.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/temenos/technology/integrationframework/t24-ofs/DEV.0.0-SNAPSHOT/t24-ofs-DEV.0.0-SNAPSHOT.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/temenos/t24/external/service/eb_ofsconnectorservice/ejb/tafj/t24-EB_OFSConnectorService-ejb/201702.0.0/t24-EB_OFSConnectorService-ejb-201702.0.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/temenos/t24/external/service/eb_ofsconnectorservice/data/t24-EB_OFSConnectorService-Data/201702.0.0/t24-EB_OFSConnectorService-Data-201702.0.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/temenos/technology/ofsml/201702.0.0/ofsml-201702.0.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/temenos/technology/integrationframework/t24-ofs/201702.0.0/t24-ofs-201702.0.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/commons/commons-lang3/3.3.2/commons-lang3-3.3.2.jar"/>
   <classpathentry kind="var" path="M2_REPO/junit/junit/4.12/junit-4.12.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/hamcrest/hamcrest-library/1.3/hamcrest-library-1.3.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar"/>
