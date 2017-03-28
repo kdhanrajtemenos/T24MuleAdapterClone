@@ -16,6 +16,7 @@
 
     <properties>
         <category>Community</category>
+		<t24.version>DEV.0.0-SNAPSHOT</t24.version>
         <licensePath>LICENSE.md</licensePath>
         <devkit.studio.package.skip>false</devkit.studio.package.skip>
         
@@ -45,24 +46,19 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- APACHE COMMON-LANG3 - FOR THE EJB RESPONCE XML PROCCESSING -->    	
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.3.2</version>
-        </dependency>
-		
+
 		<!-- TEMENOS COMMON ADDAPTER -->
         <dependency>
 		      <groupId>com.temenos.technology.integrationframework</groupId>
 		      <artifactId>t24-adapter-common</artifactId>
-		      <version>DEV.0.0-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.commons</groupId>
-					<artifactId>commons-lang3</artifactId>
-				</exclusion>
-			</exclusions>
+		      <version>${t24.version}</version>
+              <exclusions>
+                  <exclusion>
+                      <groupId>org.apache.commons</groupId>
+                      <artifactId>commons-lang3</artifactId>
+                  </exclusion>
+              </exclusions>
+			  <scope>compile</scope>
 		</dependency>
 		    
 		<!-- TEMENOS TAFJ SUPPORT -->
@@ -70,15 +66,14 @@
 			<groupId>com.temenos.tafj</groupId>
 			<artifactId>tComponentFramework</artifactId>
 			<version>17.9.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.temenos.tafj</groupId>
+					<artifactId>TAFJCore</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
-		 
-		<!-- TEMENOS ORACLE SUPPORT -->
-		<!-- <dependency>
-		      <groupId>com.temenos.technology.integrationframework.adapters.oracle</groupId>
-		      <artifactId>t24-oracle-adapter</artifactId>
-		      <version>DEV.0.0-SNAPSHOT</version>
-		</dependency> -->
-		    
+
 		<!-- THIS IS EXTRNAL LOG4J -->
 		<dependency>
 			<groupId>log4j</groupId>
@@ -97,14 +92,14 @@
 		<dependency>
 		      <groupId>com.temenos.t24.external.service.eb_ofsconnectorservice.ejb.tafj</groupId>
 				<artifactId>t24-EB_OFSConnectorService-ejb</artifactId>
-				<version>DEV.0.0-SNAPSHOT</version>
+				<version>${t24.version}</version>
 		</dependency>
 		    
 		<!-- TEMENOS DATA SUPPORT -->   	  
 		<dependency>
 			<groupId>com.temenos.t24.external.service.eb_ofsconnectorservice.data</groupId>
 			<artifactId>t24-EB_OFSConnectorService-Data</artifactId>
-			<version>DEV.0.0-SNAPSHOT</version>
+			<version>${t24.version}</version>
 		</dependency>
 		   
 		<!-- CONNECTOR RESOURCES -->  
@@ -118,7 +113,7 @@
 		<dependency>
 			<groupId>com.temenos.technology</groupId>
 			<artifactId>ofsml</artifactId>
-			<version>DEV.0.0-SNAPSHOT</version>
+			<version>${t24.version}</version>
 		</dependency>
 		
 		<dependency>
@@ -137,13 +132,7 @@
 		<dependency>
 			<groupId>com.temenos.technology.integrationframework</groupId>
 			<artifactId>t24-ofs</artifactId>
-			<version>DEV.0.0-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.commons</groupId>
-					<artifactId>commons-lang3</artifactId>
-				</exclusion>
-			</exclusions>
+			<version>${t24.version}</version>
 		</dependency>
 		
 		<!-- XSTREAM - XML BUILDER -->
@@ -255,33 +244,50 @@
 			
 			<!-- THIS PLUGIN MAKES APACHE COMMON-LANG3-3.2.2 TO WORK -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>2.3</version>
-                <configuration>
-                    <!-- custom shade configuration - the magic mushrooms -->
-                    <artifactSet>
-                        <includes>
-                            <include>org.apache.commons:commons-lang3</include>
-                            <include>t24.adapter.common:t24-adapter-common</include>
-                            <!-- try to include this version of log4j -->
-                            <include>org.apache.log4j:org-apache-log4j</include>
-                        </includes>
-                    </artifactSet>
-                    <relocations>
-                        <relocation>
-                            <pattern>org.apache.commons.lang3</pattern>
-                            <shadedPattern>org.apache.commons.lang3.shaded</shadedPattern>
-                        </relocation>
-                         <!-- try to relocate old version of log4j -->
-                        <relocation>
-                            <pattern>org.apache.log4j</pattern>
-                            <shadedPattern>org.apache.log4j.shaded</shadedPattern>
-                        </relocation>
-                    </relocations>
-                </configuration>
-            </plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.4.1</version>
+				<configuration>
+					<!-- custom shade configuration - the magic mushrooms -->
+					<!--<minimizeJar>true</minimizeJar>-->
+					<artifactSet>
+						<includes>
+							<include>org.apache.commons:commons-lang3</include>
+							<include>com.temenos.technology.integrationframework:t24-adapter-common</include>
+							<!-- try to include this version of log4j -->
+							<include>org.apache.log4j:org-apache-log4j</include>
+						</includes>
 
+					</artifactSet>
+					<relocations>
+						<relocation>
+							<pattern>org.apache.commons.lang3</pattern>
+							<shadedPattern>org.shaded.commons.lang3</shadedPattern>
+						</relocation>
+						<!-- try to relocate old version of log4j -->
+						<relocation>
+							<pattern>org.apache.log4j</pattern>
+							<shadedPattern>org.apache.log4j.shaded</shadedPattern>
+						</relocation>
+					</relocations>
+
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.mule.tools.devkit</groupId>
+				<artifactId>mule-devkit-maven-plugin</artifactId>
+				<version>3.9.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<!--<copyToAppsDirectory>true</copyToAppsDirectory>-->
+					<exclusions>
+						<exclusion>
+							<groupId>com.temenos.technology.integrationframework</groupId>
+							<artifactId>t24-adapter-common</artifactId>
+						</exclusion>
+					</exclusions>
+				</configuration>
+			</plugin>
 	    </plugins>
 		
 		<!-- Adding resource folder to look for configuration files inside -->
