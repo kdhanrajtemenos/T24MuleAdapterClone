@@ -132,7 +132,7 @@
 		<dependency>
 			<groupId>com.temenos.technology</groupId>
 			<artifactId>tocfT24ra</artifactId>
-			<version>201702.0.0</version>
+			<version>${t24.version}</version>
 		</dependency>
 		
 	</dependencies>
