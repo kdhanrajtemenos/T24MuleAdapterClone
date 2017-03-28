@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.mule.modules</groupId>
     <artifactId>t24-inbound-connector</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>201702.0.0</version>
     <packaging>mule-module</packaging>
     <name>Mule T24 Inbound Anypoint Connector</name>
 
@@ -17,6 +17,7 @@
     <properties>
         <category>Community</category>
         <licensePath>LICENSE.md</licensePath>
+		<t24.version>201702.0.0</t24.version>
         <!-- Maven should build the update site Zip file -->
 		<devkit.studio.package.skip>true</devkit.studio.package.skip>
 		 
@@ -46,33 +47,37 @@
 			<scope>provided</scope>
 		</dependency>
 
-			
-		<!-- APACHE COMMON-LANG3 - FOR THE EJB RESPONCE XML PROCCESSING -->    	
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.3.2</version>
-        </dependency>
-		
+		 <dependency>
+			 <groupId>org.apache.commons</groupId>
+			 <artifactId>commons-lang3</artifactId>
+			 <version>3.3.2</version>
+		 </dependency>
+
 		<!-- TEMENOS COMMON ADDAPTER -->
         <dependency>
 		    <groupId>com.temenos.technology.integrationframework</groupId>
 			<artifactId>t24-adapter-common</artifactId>
-			<version>DEV.0.0-SNAPSHOT</version>
+			<version>${t24.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.apache.commons</groupId>
+					<artifactId>commons-lang3</artifactId>
+				</exclusion>
+			</exclusions>
+			<scope>compile</scope>
 		</dependency>
-		
-		<!-- TEMENOS ORACLE SUPPORT -->
-		<!-- <dependency>
-		      <groupId>com.temenos.technology.integrationframework.adapters.oracle</groupId>
-		      <artifactId>t24-oracle-adapter</artifactId>
-		      <version>DEV.0.0-SNAPSHOT</version>
-		</dependency> -->		
 		
 		<!-- TEMENOS TAFJ SUPPORT -->
 		<dependency>
 		    <groupId>com.temenos.tafj</groupId>
 			<artifactId>tComponentFramework</artifactId>
 			<version>17.9.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.temenos.tafj</groupId>
+					<artifactId>TAFJCore</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		
 		<!-- THIS IS EXTRNAL LOG4J -->
@@ -114,20 +119,20 @@
 		<dependency>
 		      <groupId>com.temenos.t24.external.service.if_integrationframeworkservice.tafj</groupId>
 				<artifactId>t24-IF_IntegrationFrameworkService-t24service</artifactId>
-		      <version>DEV.0.0-SNAPSHOT</version>
+		      <version>${t24.version}</version>
 		</dependency> 
 		    
 		<!-- TEMENOS DATA SUPPORT -->   	  
 		<dependency>
 			<groupId>com.temenos.t24.external.service.eb_ofsconnectorservice.data</groupId>
 			<artifactId>t24-EB_OFSConnectorService-Data</artifactId>
-			<version>DEV.0.0-SNAPSHOT</version>
+			<version>${t24.version}</version>
 		</dependency>
 		
 		<dependency>
 			<groupId>com.temenos.technology</groupId>
-			<artifactId>tocft24ra</artifactId>
-			<version>DEV.0.0-SNAPSHOT</version>
+			<artifactId>tocfT24ra</artifactId>
+			<version>201702.0.0</version>
 		</dependency>
 		
 	</dependencies>
@@ -195,33 +200,36 @@
 			</plugin>
 			
 			<!-- THIS PLUGIN MAKES APACHE COMMON-LANG3-3.2.2 TO WORK -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>2.3</version>
-                <configuration>
-                    <!-- custom shade configuration - the magic mushrooms -->
-                    <artifactSet>
-                        <includes>
-                            <include>org.apache.commons:commons-lang3</include>
-                            <include>com.temenos.technology.integrationframework:t24-adapter-common</include>
-                            <!-- try to include this version of log4j -->
-                            <include>org.apache.log4j:org-apache-log4j</include>
-                        </includes>
-                    </artifactSet>
-                    <relocations>
-                        <relocation>
-                            <pattern>org.apache.commons.lang3</pattern>
-                            <shadedPattern>org.apache.commons.lang3.shaded</shadedPattern>
-                        </relocation>
-                         <!-- try to relocate old version of log4j -->
-                        <relocation>
-                            <pattern>org.apache.log4j</pattern>
-                            <shadedPattern>org.apache.log4j.shaded</shadedPattern>
-                        </relocation>
-                    </relocations>
-                </configuration>
-            </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.4.1</version>
+				<configuration>
+					<!-- custom shade configuration - the magic mushrooms -->
+					<!--<minimizeJar>true</minimizeJar>-->
+					<artifactSet>
+						<includes>
+							<include>org.apache.commons:commons-lang3</include>
+							<include>com.temenos.technology.integrationframework:t24-adapter-common</include>
+							<!-- try to include this version of log4j -->
+							<include>org.apache.log4j:org-apache-log4j</include>
+						</includes>
+
+					</artifactSet>
+					<relocations>
+						<relocation>
+							<pattern>org.apache.commons.lang3</pattern>
+							<shadedPattern>org.shaded.commons.lang3</shadedPattern>
+						</relocation>
+						<!-- try to relocate old version of log4j -->
+						<relocation>
+							<pattern>org.apache.log4j</pattern>
+							<shadedPattern>org.apache.log4j.shaded</shadedPattern>
+						</relocation>
+					</relocations>
+
+				</configuration>
+			</plugin>
 
 			
 			
