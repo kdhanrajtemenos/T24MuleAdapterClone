@@ -1,0 +1,1 @@
+By downloading and installing the software you agree to be bound by all the terms and conditions of your Temenos software license agreement.
