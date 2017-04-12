@@ -2,12 +2,12 @@ package com.temenos.adapter.mule.T24inbound.connector.proxy;
 
 
 
+import com.temenos.services.integrationflow.data.response.xsd.GetAllFlowNamesResponse;
+import com.temenos.services.integrationflow.data.response.xsd.GetAllFlowSchemasResponse;
+import com.temenos.services.integrationflow.data.response.xsd.GetFlowSchemaResponse;
+import com.temenos.soa.services.data.xsd.T24UserDetails;
+import integrationflowservicews.IntegrationFlowServiceWSPortType;
 import org.mule.api.ConnectionException;
-import org.mule.modules.t24inbound.definition.GetAllFlowNamesResponse;
-import org.mule.modules.t24inbound.definition.GetAllFlowSchemasResponse;
-import org.mule.modules.t24inbound.definition.GetFlowSchemaResponse;
-import org.mule.modules.t24inbound.definition.IntegrationFlowServiceWSPortType;
-import org.mule.modules.t24inbound.definition.T24UserDetails;
 
 
 public class IntegrationFlowServiceWSClient {
@@ -17,11 +17,6 @@ public class IntegrationFlowServiceWSClient {
 	private IntegrationFlowServiceWSPortType port;
 	
 	private ServiceEndPointType endPointType;
-	
-	public IntegrationFlowServiceWSClient(){
-		/* default location*/
-		this.setWsdlLoaction("wsdl/IntegrationFlowServiceWS.wsdl");
-	}
 	
 	public IntegrationFlowServiceWSClient(String wsdlLoaction){
 		this.setWsdlLoaction(wsdlLoaction);

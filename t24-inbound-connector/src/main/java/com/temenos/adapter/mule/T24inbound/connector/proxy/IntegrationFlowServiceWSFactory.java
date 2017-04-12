@@ -3,11 +3,11 @@ package com.temenos.adapter.mule.T24inbound.connector.proxy;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import integrationflowservicews.IntegrationFlowServiceWS;
+import integrationflowservicews.IntegrationFlowServiceWSPortType;
 import org.mule.api.ConnectionException;
 import org.mule.api.ConnectionExceptionCode;
 
-import org.mule.modules.t24inbound.definition.IntegrationFlowServiceWS;
-import org.mule.modules.t24inbound.definition.IntegrationFlowServiceWSPortType;
 
 public class IntegrationFlowServiceWSFactory {
 	

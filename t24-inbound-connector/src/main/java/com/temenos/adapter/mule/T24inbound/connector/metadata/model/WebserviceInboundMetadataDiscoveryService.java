@@ -24,6 +24,13 @@ import com.temenos.soa.services.data.xsd.ResponseDetails;
 import com.temenos.soa.services.data.xsd.T24UserDetails;
 */
 import com.temenos.adapter.mule.T24inbound.connector.proxy.IntegrationFlowServiceWSClient;
+import com.temenos.services.integrationflow.data.response.xsd.GetAllFlowNamesResponse;
+import com.temenos.services.integrationflow.data.response.xsd.GetFlowSchemaResponse;
+import com.temenos.services.integrationflow.data.xsd.IntegrationFlowSchema;
+import com.temenos.soa.services.data.xsd.ObjectFactory;
+import com.temenos.soa.services.data.xsd.ResponseDetails;
+import com.temenos.soa.services.data.xsd.T24UserDetails;
+import integrationflowservicews.IntegrationFlowServiceWSPortType;
 
 //import integrationflowservicews.IntegrationFlowServiceWS;
 //import integrationflowservicews.IntegrationFlowServiceWSPortType;
@@ -37,7 +44,6 @@ import java.util.List;
 
 
 ////////////////
-import org.mule.modules.t24inbound.definition.*;
 
 ///////////////
 

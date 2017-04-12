@@ -28,13 +28,13 @@
 		<cxf.version.boolean>2.6.0</cxf.version.boolean>
 		 
 		<!-- Package name, WSDL file path and location in the JAR -->
-		<connector.package>
+		<!--<connector.package>
 		    org.mule.modules.t24inbound.definition
 		</connector.package>
 		<connector.wsdl>
 		    ${basedir}/src/main/resources/wsdl/IntegrationFlowServiceWS.wsdl
 		</connector.wsdl>
-		<connector.wsdlLocation>classpath:wsdl/IntegrationFlowServiceWS.wsdl</connector.wsdlLocation>
+		<connector.wsdlLocation>classpath:wsdl/IntegrationFlowServiceWS.wsdl</connector.wsdlLocation>-->
     </properties>
     
      <dependencies>
@@ -134,23 +134,28 @@
 			<artifactId>tocfT24ra</artifactId>
 			<version>${t24.version}</version>
 		</dependency>
+	 	<dependency>
+			<groupId>com.temenos.t24.external.service.if_integrationflowservice.ws.client</groupId>
+			<artifactId>t24-IF_IntegrationFlowService-IntegrationFlowServiceWS-jwc</artifactId>
+			<version>${t24.version}</version>
+		</dependency>
 		
 	</dependencies>
     
      <build>
 	    <plugins>
 	    
-			<plugin>
+			<!--<plugin>
 			    <groupId>org.apache.cxf</groupId>
 			    <artifactId>cxf-codegen-plugin</artifactId>
 			    <version>${cxf.version}</version>
 			    <executions>
 			        <execution>
-			            <!-- Note that validate phase is not the usual phase to
+			            &lt;!&ndash; Note that validate phase is not the usual phase to
 			              run WSDL2Java. This is done because DevKit requires the
 			              class be generated so it can be used in generate-sources
 			              phase by DevKit. The DevKit generates code from annotations
-			              etc. and references the WSDL2Java generated output.  -->
+			              etc. and references the WSDL2Java generated output.  &ndash;&gt;
 			           
 			            <goals>
 			                <goal>wsdl2java</goal>
@@ -158,22 +163,22 @@
 			            <configuration>
 			                <wsdlOptions>
 			                    <wsdlOption>
-			                        <!-- WSDL File Path -->
+			                        &lt;!&ndash; WSDL File Path &ndash;&gt;
 			                        <wsdl>${connector.wsdl}</wsdl>
-			                        <!-- pick up the WSDL from within the JAR -->
+			                        &lt;!&ndash; pick up the WSDL from within the JAR &ndash;&gt;
 			                        <wsdlLocation>${connector.wsdlLocation}</wsdlLocation> 
-			                        <autoNameResolution>true</autoNameResolution>
+			                        <autoNameResolution>false</autoNameResolution>
 			                        <extraargs>
-			                            <!-- Package Destination -->
+			                            &lt;!&ndash; Package Destination &ndash;&gt;
 			                            <extraarg>-p</extraarg>
-			                            <!-- Name of the output package specified
-			                              that follows the -p argument to wsdl2java. -->
+			                            &lt;!&ndash; Name of the output package specified
+			                              that follows the -p argument to wsdl2java. &ndash;&gt;
 			                            <extraarg>
 			                                ${connector.package}
 			                            </extraarg>
-			                                <!-- DataMapper compatibility requires that
+			                                &lt;!&ndash; DataMapper compatibility requires that
 			                                boolean getters and setters follow naming
-			                                conventions for other getters and setters. -->
+			                                conventions for other getters and setters. &ndash;&gt;
 			                            <extraarg>-xjc-Xbg</extraarg>
 			                            <extraarg>-xjc-Xcollection-setter-injector</extraarg>
 			                        </extraargs>
@@ -184,20 +189,20 @@
 			        </execution>
 			    </executions>
 			    <dependencies>
-			        <!-- Boolean Getters -->
+			        &lt;!&ndash; Boolean Getters &ndash;&gt;
 			        <dependency>
 			            <groupId>org.apache.cxf.xjcplugins</groupId>
 			            <artifactId>cxf-xjc-boolean</artifactId>
 			            <version>${cxf.version.boolean}</version>
 			        </dependency>
-			        <!-- Collection Setters -->
+			        &lt;!&ndash; Collection Setters &ndash;&gt;
 			        <dependency>
 			            <groupId>net.java.dev.vcc.thirdparty</groupId>
 			            <artifactId>collection-setter-injector</artifactId>
 			            <version>0.5.0-1</version>
 			        </dependency>
 			    </dependencies>
-			</plugin>
+			</plugin>-->
 			
 			<!-- THIS PLUGIN MAKES APACHE COMMON-LANG3-3.2.2 TO WORK -->
 			<plugin>
@@ -230,10 +235,17 @@
 
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
 
-			
-			
-	    </plugins>
+
+		</plugins>
 		
 		<!-- Adding resource folder to  look for configuration files -->
 	    <resources>

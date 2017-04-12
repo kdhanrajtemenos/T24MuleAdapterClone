@@ -1,7 +1,8 @@
 package com.temenos.adapter.mule.T24inbound.connector.proxy;
 
-import org.mule.modules.t24inbound.definition.IntegrationFlowServiceWS;
-import org.mule.modules.t24inbound.definition.IntegrationFlowServiceWSPortType;
+
+import integrationflowservicews.IntegrationFlowServiceWS;
+import integrationflowservicews.IntegrationFlowServiceWSPortType;
 
 public class IntegrationFlowServiceEndPoint {
 	
