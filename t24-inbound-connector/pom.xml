@@ -19,7 +19,7 @@
         <licensePath>LICENSE.md</licensePath>
 		<t24.version>DEV.0.0-SNAPSHOT</t24.version>
         <!-- Maven should build the update site Zip file -->
-		<devkit.studio.package.skip>true</devkit.studio.package.skip>
+		<devkit.studio.package.skip>false</devkit.studio.package.skip>
 		 
         <!-- Adding CXF Support -->
         
