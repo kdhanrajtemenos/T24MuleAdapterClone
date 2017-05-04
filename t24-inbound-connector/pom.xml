@@ -101,12 +101,12 @@
 			<version>15.0.0.0</version>
 		</dependency>
 		
-		<!-- JBOSS CLIENT -->   	    
-		<dependency>
-		    <groupId>org.jboss</groupId>
-            <artifactId>jboss-client</artifactId>
-            <version>7.2.0</version>
-		</dependency>
+		<!-- JBOSS CLIENT -->
+		 <dependency>
+			 <groupId>org.jboss.client</groupId>
+			 <artifactId>jboss-client</artifactId>
+			 <version>7.0.0.GA-redhat-2</version>
+		 </dependency>
 		
 		<!-- https://mvnrepository.com/artifact/org.glassfish.jersey.bundles.repackaged/jersey-guava-->
 		<dependency>
