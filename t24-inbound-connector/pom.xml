@@ -126,14 +126,14 @@
 			 <artifactId>t24-IF_IntegrationFrameworkService-ejb</artifactId>
 			 <version>${t24.version}</version>
 		 </dependency>
+		 <dependency>
+			 <groupId>com.temenos.t24.external.service.if_integrationframeworkservice.data</groupId>
+			 <artifactId>t24-IF_IntegrationFrameworkService-Data</artifactId>
+			 <version>${t24.version}</version>
+		 </dependency>
 
 		 <!-- TEMENOS DATA SUPPORT -->
-		<dependency>
-			<groupId>com.temenos.t24.external.service.eb_ofsconnectorservice.data</groupId>
-			<artifactId>t24-EB_OFSConnectorService-Data</artifactId>
-			<version>${t24.version}</version>
-		</dependency>
-		
+
 		<dependency>
 			<groupId>com.temenos.technology</groupId>
 			<artifactId>tocfT24ra</artifactId>
