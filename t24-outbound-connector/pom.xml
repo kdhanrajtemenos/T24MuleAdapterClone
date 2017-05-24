@@ -181,133 +181,151 @@
     </dependencies>
     
     <build>
-	    <plugins>
-	    
-			<plugin>
-			    <groupId>org.apache.cxf</groupId>
-			    <artifactId>cxf-codegen-plugin</artifactId>
-			    <version>${cxf.version}</version>
-			    <executions>
-			        <execution>
+	<plugins>
+
+		<plugin>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-codegen-plugin</artifactId>
+			<version>${cxf.version}</version>
+			<executions>
+				<execution>
 			            <!-- Note that validate phase is not the usual phase to
 			              run WSDL2Java. This is done because DevKit requires the
 			              class be generated so it can be used in generate-sources
 			              phase by DevKit. The DevKit generates code from annotations
 			              etc. and references the WSDL2Java generated output.  -->
-			           
-			            <goals>
-			                <goal>wsdl2java</goal>
-			            </goals>
-			            <configuration>
-			                <wsdlOptions>
-			                    <wsdlOption>
+
+					<goals>
+						<goal>wsdl2java</goal>
+					</goals>
+					<configuration>
+						<wsdlOptions>
+							<wsdlOption>
 			                        <!-- WSDL File Path -->
-			                        <wsdl>${connector.wsdl}</wsdl>
+								<wsdl>${connector.wsdl}</wsdl>
 			                        <!-- pick up the WSDL from within the JAR -->
-			                        <wsdlLocation>${connector.wsdlLocation}</wsdlLocation> 
-			                        <autoNameResolution>true</autoNameResolution>
-			                        <extraargs>
+								<wsdlLocation>${connector.wsdlLocation}</wsdlLocation>
+								<autoNameResolution>true</autoNameResolution>
+								<extraargs>
 			                            <!-- Package Destination -->
-			                            <extraarg>-p</extraarg>
+									<extraarg>-p</extraarg>
 			                            <!-- Name of the output package specified
 			                              that follows the -p argument to wsdl2java. -->
-			                            <extraarg>
-			                                ${connector.package}
-			                            </extraarg>
+									<extraarg>
+										${connector.package}
+									</extraarg>
 			                                <!-- DataMapper compatibility requires that
 			                                boolean getters and setters follow naming
 			                                conventions for other getters and setters. -->
-			                            <extraarg>-xjc-Xbg</extraarg>
-			                            <extraarg>-xjc-Xcollection-setter-injector</extraarg>
-			                        </extraargs>
-			                    </wsdlOption>
-			                </wsdlOptions>
-			            </configuration>
+									<extraarg>-xjc-Xbg</extraarg>
+									<extraarg>-xjc-Xcollection-setter-injector</extraarg>
+								</extraargs>
+							</wsdlOption>
+						</wsdlOptions>
+					</configuration>
 
-			        </execution>
-			    </executions>
-			    <dependencies>
+				</execution>
+			</executions>
+			<dependencies>
 			        <!-- Boolean Getters -->
-			        <dependency>
-			            <groupId>org.apache.cxf.xjcplugins</groupId>
-			            <artifactId>cxf-xjc-boolean</artifactId>
-			            <version>${cxf.version.boolean}</version>
-			        </dependency>
+				<dependency>
+					<groupId>org.apache.cxf.xjcplugins</groupId>
+					<artifactId>cxf-xjc-boolean</artifactId>
+					<version>${cxf.version.boolean}</version>
+				</dependency>
 			        <!-- Collection Setters -->
-			        <dependency>
-			            <groupId>net.java.dev.vcc.thirdparty</groupId>
-			            <artifactId>collection-setter-injector</artifactId>
-			            <version>0.5.0-1</version>
-			        </dependency>
-			    </dependencies>
-			</plugin>
+				<dependency>
+					<groupId>net.java.dev.vcc.thirdparty</groupId>
+					<artifactId>collection-setter-injector</artifactId>
+					<version>0.5.0-1</version>
+				</dependency>
+			</dependencies>
+		</plugin>
 			
 			<!-- THIS PLUGIN MAKES APACHE COMMON-LANG3-3.2.2 TO WORK -->
-            <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.4.1</version>
-				<configuration>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-shade-plugin</artifactId>
+			<version>2.4.1</version>
+			<configuration>
 					<!-- custom shade configuration - the magic mushrooms -->
 					<!--<minimizeJar>true</minimizeJar>-->
-					<artifactSet>
-						<includes>
-							<include>org.apache.commons:commons-lang3</include>
-							<include>com.temenos.technology.integrationframework:t24-adapter-common</include>
+				<artifactSet>
+					<includes>
+						<include>org.apache.commons:commons-lang3</include>
+						<include>com.temenos.technology.integrationframework:t24-adapter-common</include>
 							<!-- try to include this version of log4j -->
-							<include>org.apache.log4j:org-apache-log4j</include>
-						</includes>
+						<include>org.apache.log4j:org-apache-log4j</include>
+					</includes>
 
-					</artifactSet>
-					<relocations>
-						<relocation>
-							<pattern>org.apache.commons.lang3</pattern>
-							<shadedPattern>org.shaded.commons.lang3</shadedPattern>
-						</relocation>
+				</artifactSet>
+				<relocations>
+					<relocation>
+						<pattern>org.apache.commons.lang3</pattern>
+						<shadedPattern>org.shaded.commons.lang3</shadedPattern>
+					</relocation>
 						<!-- try to relocate old version of log4j -->
-						<relocation>
-							<pattern>org.apache.log4j</pattern>
-							<shadedPattern>org.apache.log4j.shaded</shadedPattern>
-						</relocation>
-					</relocations>
+					<relocation>
+						<pattern>org.apache.log4j</pattern>
+						<shadedPattern>org.apache.log4j.shaded</shadedPattern>
+					</relocation>
+				</relocations>
 
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.mule.tools.devkit</groupId>
-				<artifactId>mule-devkit-maven-plugin</artifactId>
-				<version>3.9.0</version>
-				<extensions>true</extensions>
-				<configuration>
+			</configuration>
+		</plugin>
+		<plugin>
+			<groupId>org.mule.tools.devkit</groupId>
+			<artifactId>mule-devkit-maven-plugin</artifactId>
+			<version>3.9.0</version>
+			<extensions>true</extensions>
+			<configuration>
 					<!--<copyToAppsDirectory>true</copyToAppsDirectory>-->
-					<exclusions>
-						<exclusion>
-							<groupId>com.temenos.technology.integrationframework</groupId>
-							<artifactId>t24-adapter-common</artifactId>
-						</exclusion>
-					</exclusions>
-				</configuration>
-			</plugin>
-	    </plugins>
+				<exclusions>
+					<exclusion>
+						<groupId>com.temenos.technology.integrationframework</groupId>
+						<artifactId>t24-adapter-common</artifactId>
+					</exclusion>
+				</exclusions>
+			</configuration>
+		</plugin>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-antrun-plugin</artifactId>
+			<version>1.7</version>
+			<executions>
+				<execution>
+					<phase>package</phase>
+					<configuration>
+						<target>
+							<copy file="${project.build.directory}/UpdateSite.zip" tofile="${project.build.directory}/${artifactId}-plugin-${version}.zip" />
+						</target>
+					</configuration>
+					<goals>
+						<goal>run</goal>
+					</goals>
+				</execution>
+			</executions>
+		</plugin>
+	</plugins>
 		
 		<!-- Adding resource folder to look for configuration files inside -->
-	    <resources>
-		   <resource>
-	        <directory>src/main/resources</directory>
-	        <includes>
-		          <include>**/*.prop</include>
-		          <include>**/*.properties</include>
-		          <include>**/*.xml</include>
-		          <include>**/*.wsdl</include>
+	<resources>
+		<resource>
+			<directory>src/main/resources</directory>
+			<includes>
+				<include>**/*.prop</include>
+				<include>**/*.properties</include>
+				<include>**/*.xml</include>
+				<include>**/*.wsdl</include>
 		          
 		          <!-- for TESTS -->
-		          <include>**/*.cfg</include>
-		          <include>**/*.txt</include>
-		          <include>**/*.md</include>
-	        </includes>
-	      </resource>
-    	</resources>
-    </build>
+				<include>**/*.cfg</include>
+				<include>**/*.txt</include>
+				<include>**/*.md</include>
+			</includes>
+		</resource>
+	</resources>
+</build>
     
 
     <repositories>
