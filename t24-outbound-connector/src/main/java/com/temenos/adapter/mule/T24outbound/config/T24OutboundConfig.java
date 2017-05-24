@@ -10,9 +10,7 @@ import com.temenos.adapter.common.conf.DefaultRuntimeConfiguration;
 import com.temenos.adapter.common.conf.T24InvalidConfigurationException;
 import com.temenos.adapter.common.conf.T24RuntimeConfiguration;
 import com.temenos.adapter.common.conf.T24RuntimeConfigurationFactory;
-
 import com.temenos.adapter.common.metadata.T24ServiceXmlMetadata;
-
 import com.temenos.adapter.common.runtime.RuntimeType;
 //import com.temenos.adapter.common.runtime.T24RuntimeException;
 import com.temenos.adapter.common.runtime.outbound.RequestType;
@@ -389,9 +387,10 @@ public class T24OutboundConfig {
 
 	/**
 	 * Get TAFJ Runtime Configuration
+	 * @param requestType 
 	 * @throws RuntimeException
 	 */
-    public T24RuntimeConfiguration getTafjRuntimeConfiguration() {
+    public T24RuntimeConfiguration getTafjRuntimeConfiguration(RequestType requestType) {
         if (tafjRuntimeConfiguration == null) {
             DefaultRuntimeConfiguration runtimeConfiguration = new DefaultRuntimeConfiguration();
             Properties connectionProperties = runtimeConfiguration.getTafjProperties();
@@ -414,21 +413,22 @@ public class T24OutboundConfig {
 
             connectionProperties.put(JBOSS_NODE_NAME, getNodeNames());  
             
-            
-            switch (serverTypeObject) {
-	            case WEBLOGIC_12C:
-	            case WEBLOGIC_11G:
-	            	connectionProperties.setProperty(AdapterProperties.TAFJ_EJB_NAME, WEBLOGIC_EJB_JNDI_OFSCONNECTOR_SERVICE_BEAN_REMOTE_OFS);
-	                break;
-	            case JBOSS_4_2_3:
-	            case JBOSS_7_2:
-	            	connectionProperties.setProperty(AdapterProperties.TAFJ_EJB_NAME, JBOSS_OFS_CONNECTOR_SERVICE_BEAN_TAFJOFS);
-	                break;
-	            case WEBSPHERE:
-	            	connectionProperties.setProperty(AdapterProperties.TAFJ_EJB_NAME, WEBSPHERE_OFS_CONNECTOR_SERVICE_BEAN_REMOTE_TAFJ);
-	                break;
-	            default:
-	                throw new RuntimeException("Unsupported application server type provided. Please check [server type] property");
+            if (!RequestType.SERVICE_XML.equals(requestType)){
+                switch (serverTypeObject) {
+    	            case WEBLOGIC_12C:
+    	            case WEBLOGIC_11G:
+    	            	connectionProperties.setProperty(AdapterProperties.TAFJ_EJB_NAME, WEBLOGIC_EJB_JNDI_OFSCONNECTOR_SERVICE_BEAN_REMOTE_OFS);
+    	                break;
+    	            case JBOSS_4_2_3:
+    	            case JBOSS_7_2:
+    	            	connectionProperties.setProperty(AdapterProperties.TAFJ_EJB_NAME, JBOSS_OFS_CONNECTOR_SERVICE_BEAN_TAFJOFS);
+    	                break;
+    	            case WEBSPHERE:
+    	            	connectionProperties.setProperty(AdapterProperties.TAFJ_EJB_NAME, WEBSPHERE_OFS_CONNECTOR_SERVICE_BEAN_REMOTE_TAFJ);
+    	                break;
+    	            default:
+    	                throw new RuntimeException("Unsupported application server type provided. Please check [server type] property");
+                }
             }
             
             
@@ -446,12 +446,8 @@ public class T24OutboundConfig {
             Properties authenticationProperties = new Properties();
     		authenticationProperties.put(AdapterProperties.T24_AUTH_USER_NAME, getSecurityPrincipal());
     		authenticationProperties.put(AdapterProperties.T24_AUTH_PASSWORD, getSecurityCredentials());
-
-    		
-    		Properties jbossProperties = setSingleServerProperties(connectionProperties);
-    		
             try {
-                instance.tafjRuntimeConfiguration = T24RuntimeConfigurationFactory.buildRuntimeConfiguration(RuntimeType.TAFJ,/*connectionProperties*/jbossProperties, authenticationProperties, false);
+                instance.tafjRuntimeConfiguration = T24RuntimeConfigurationFactory.buildRuntimeConfiguration(RuntimeType.TAFJ,connectionProperties, authenticationProperties, false);
             } catch (T24InvalidConfigurationException e) {
                 throw new RuntimeException(e);
             }
@@ -459,35 +455,6 @@ public class T24OutboundConfig {
         return tafjRuntimeConfiguration;
     }
     
-    
-    private Properties setSingleServerProperties(Properties connectionProperties) {
-    	Properties jbossProperties = new Properties();
-    	
-    	jbossProperties.put("remote.connectionprovider.create.options.org.xnio.Options.SSL_ENABLED", "false");
-    	jbossProperties.put("remote.connections", "default");
-        String host = connectionProperties.getProperty("RemoteConnectionHost");
-        jbossProperties.put("remote.connection.default.host", host);
-        String port = connectionProperties.getProperty("RemoteConnectionPort");
-        jbossProperties.put("remote.connection.default.port", port);
-        jbossProperties.put("remote.connection.default.connect.options.org.xnio.Options.SASL_POLICY_NOANONYMOUS", "false");
-        jbossProperties.put("remote.connection.default.connect.options.org.xnio.Options.SASL_POLICY_NOPLAINTEXT", "false");
-        jbossProperties.put("remote.connection.default.username", connectionProperties.getProperty("SecurityPrincipal"));
-//        String passwordBase64 = connectionProperties.getProperty("SecurityCredentialBase64");
-//        if(ConfigDataUtil.isNotEmpty(passwordBase64)) {
-//            jbossProperties.put("remote.connection.default.password.base64", passwordBase64);
-//        } else {
-//            jbossProperties.put("remote.connection.default.password.base64", connectionProperties.getProperty("SecurityCredential"));
-//        }
-        
-        jbossProperties.put("remote.connection.default.password", connectionProperties.getProperty("SecurityCredential"));
-
-        jbossProperties.put("remote.connection.default.connect.timeout", "30000");
-        jbossProperties.put("remote.connection.default.connect.sotimeout", "30000");
-        jbossProperties.put("jboss.naming.client.ejb.context", "true");
-        //logger.fine("Mapping EJB JNDI properties for the default server connection. Host [" + host + "], port [" + port + "]");
-        
-        return jbossProperties;
-    }
 
 	/**
 	 * Get TAFC Runtime Configuration
@@ -554,7 +521,7 @@ public class T24OutboundConfig {
 		
 		T24RuntimeConfiguration config = null;
 		if(this.runtime.equals(runtimeVersionTAFJ)){
-			config = instance.getTafjRuntimeConfiguration();
+			config = instance.getTafjRuntimeConfiguration(requestType);
 		}else{
 			config = instance.getTafcRuntimeConfiguration();
 		}
