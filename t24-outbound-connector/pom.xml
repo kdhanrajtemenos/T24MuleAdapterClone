@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.mule.modules</groupId>
     <artifactId>t24-outbound-connector</artifactId>
-    <version>201702.0.0</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>mule-module</packaging>
     <name>Mule T24Outbound Anypoint Connector</name>
 
@@ -16,23 +16,15 @@
 
     <properties>
         <category>Community</category>
-		<t24.version>201702.0.0</t24.version>
+		<t24.version>DEV.0.0-SNAPSHOT</t24.version>
         <licensePath>LICENSE.md</licensePath>
         <devkit.studio.package.skip>false</devkit.studio.package.skip>
+		<jdk.version>1.8</jdk.version>
         
 		<!--  CXF version info -->       
 		<cxf.version>2.7.7</cxf.version>
 		<cxf.version.boolean>2.6.0</cxf.version.boolean>
 		 
-		<!-- Package name, WSDL file path and location in the JAR -->
-		<connector.package>
-		    com.temenos.adapter.mule.T24outbound.definition
-		</connector.package>
-		<connector.wsdl>
-		    ${basedir}/src/main/resources/wsdl/IntegrationLandscapeServiceWS.wsdl
-		</connector.wsdl>
-		<connector.wsdlLocation>classpath:wsdl/IntegrationLandscapeServiceWS.wsdl</connector.wsdlLocation>
-        
     </properties>
     
     
@@ -83,11 +75,18 @@
 		 
 		<!-- JBOSS CLIENT -->   	    
 		<dependency>
-		    <groupId>org.jboss</groupId>
-            <artifactId>jboss-client</artifactId>
-            <version>7.2.0</version>
+			<groupId>org.jboss.client</groupId>
+			<artifactId>jboss-client</artifactId>
+			<version>7.0.0.GA-redhat-2</version>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>com.temenos.t24.external.service.eb_ofsconnectorservice.tafj</groupId>
+			<artifactId>t24-EB_OFSConnectorService-t24service</artifactId>
+			<version>DEV.0.0-SNAPSHOT</version>
+		</dependency>
+
+
 		<!-- TEMENOS EJB SUPPORT -->   	  
 		<dependency>
 		      <groupId>com.temenos.t24.external.service.eb_ofsconnectorservice.ejb.tafj</groupId>
@@ -99,6 +98,12 @@
 		<dependency>
 			<groupId>com.temenos.t24.external.service.eb_ofsconnectorservice.data</groupId>
 			<artifactId>t24-EB_OFSConnectorService-Data</artifactId>
+			<version>${t24.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.temenos.t24.external.service.if_integrationlandscapeservice.ws.client</groupId>
+			<artifactId>t24-IF_IntegrationLandscapeService-IntegrationLandscapeServiceWS-jwc</artifactId>
 			<version>${t24.version}</version>
 		</dependency>
 		   
@@ -183,65 +188,6 @@
     <build>
 	<plugins>
 
-		<plugin>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-codegen-plugin</artifactId>
-			<version>${cxf.version}</version>
-			<executions>
-				<execution>
-			            <!-- Note that validate phase is not the usual phase to
-			              run WSDL2Java. This is done because DevKit requires the
-			              class be generated so it can be used in generate-sources
-			              phase by DevKit. The DevKit generates code from annotations
-			              etc. and references the WSDL2Java generated output.  -->
-
-					<goals>
-						<goal>wsdl2java</goal>
-					</goals>
-					<configuration>
-						<wsdlOptions>
-							<wsdlOption>
-			                        <!-- WSDL File Path -->
-								<wsdl>${connector.wsdl}</wsdl>
-			                        <!-- pick up the WSDL from within the JAR -->
-								<wsdlLocation>${connector.wsdlLocation}</wsdlLocation>
-								<autoNameResolution>true</autoNameResolution>
-								<extraargs>
-			                            <!-- Package Destination -->
-									<extraarg>-p</extraarg>
-			                            <!-- Name of the output package specified
-			                              that follows the -p argument to wsdl2java. -->
-									<extraarg>
-										${connector.package}
-									</extraarg>
-			                                <!-- DataMapper compatibility requires that
-			                                boolean getters and setters follow naming
-			                                conventions for other getters and setters. -->
-									<extraarg>-xjc-Xbg</extraarg>
-									<extraarg>-xjc-Xcollection-setter-injector</extraarg>
-								</extraargs>
-							</wsdlOption>
-						</wsdlOptions>
-					</configuration>
-
-				</execution>
-			</executions>
-			<dependencies>
-			        <!-- Boolean Getters -->
-				<dependency>
-					<groupId>org.apache.cxf.xjcplugins</groupId>
-					<artifactId>cxf-xjc-boolean</artifactId>
-					<version>${cxf.version.boolean}</version>
-				</dependency>
-			        <!-- Collection Setters -->
-				<dependency>
-					<groupId>net.java.dev.vcc.thirdparty</groupId>
-					<artifactId>collection-setter-injector</artifactId>
-					<version>0.5.0-1</version>
-				</dependency>
-			</dependencies>
-		</plugin>
-			
 			<!-- THIS PLUGIN MAKES APACHE COMMON-LANG3-3.2.2 TO WORK -->
 		<plugin>
 			<groupId>org.apache.maven.plugins</groupId>
@@ -297,7 +243,7 @@
 					<phase>package</phase>
 					<configuration>
 						<target>
-							<copy file="${project.build.directory}/UpdateSite.zip" tofile="${project.build.directory}/${artifactId}-plugin-${version}.zip" />
+							<copy file="${project.build.directory}/UpdateSite.zip" tofile="${project.build.directory}/${artifactId}-site-${version}.zip" />
 						</target>
 					</configuration>
 					<goals>
