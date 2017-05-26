@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.mule.modules</groupId>
     <artifactId>t24-inbound-connector</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>201705.0.0</version>
     <packaging>mule-module</packaging>
     <name>Mule T24 Inbound Anypoint Connector</name>
 
@@ -17,7 +17,7 @@
     <properties>
         <category>Community</category>
         <licensePath>LICENSE.md</licensePath>
-		<t24.version>DEV.0.0-SNAPSHOT</t24.version>
+		<t24.version>201705.0.0</t24.version>
         <!-- Maven should build the update site Zip file -->
 		<devkit.studio.package.skip>false</devkit.studio.package.skip>
 		<jdk.version>1.8</jdk.version>
