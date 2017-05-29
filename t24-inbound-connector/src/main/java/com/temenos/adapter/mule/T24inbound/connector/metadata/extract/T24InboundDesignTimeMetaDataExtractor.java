@@ -4,11 +4,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import com.temenos.adapter.mule.T24inbound.connector.config.ConnectorConfig;
 import com.temenos.adapter.mule.T24inbound.connector.metadata.model.InboundMetadataModel;
 import com.temenos.adapter.mule.T24inbound.connector.metadata.model.Metadata;
+import com.temenos.adapter.mule.T24inbound.connector.metadata.model.MetadataSchema;
 import com.temenos.adapter.mule.T24inbound.connector.utils.IoResourseUtil;
 
 
@@ -139,20 +144,30 @@ public class T24InboundDesignTimeMetaDataExtractor extends T24BaseInboundMetadat
 		String outSchemaFolder = ioProcessor.createDirectory(fullPath, OUTPUT_SCHEMA_FOLDER_NAME); // Output
 		String schema;
 		String outSchemaFile;
+		String importedSchema;
+		String importedOutSchemaFile;
+		Map<String, MetadataSchema> importedSchemas = new HashMap<String, MetadataSchema>();
 		
 		for(InboundMetadataModel model : this.getOnlySelectable()){
-
 			schema = model.getMasterSchema().getContent();
-
 			outSchemaFile = outSchemaFolder + File.separatorChar + OUTPUT_FILE_SHEMA_PREFIX + model.getName() + SCHEMA_FILE_EXT;
-				
+			importedSchemas.putAll(model.getImportedSchemas());
 			try {
 				ioProcessor.writeSchemas(outSchemaFile, schema);
 			} catch (IOException e) {
 				e.printStackTrace();
-			}
-			
+			}			
 		}
+
+		for(Entry<String, MetadataSchema> schemaEntry :importedSchemas.entrySet()){
+			importedOutSchemaFile = outSchemaFolder + File.separatorChar + OUTPUT_FILE_SHEMA_PREFIX + schemaEntry.getValue().getLocation();
+			importedSchema = schemaEntry.getValue().getContent();
+			try {
+				ioProcessor.writeSchemas(importedOutSchemaFile, importedSchema);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}	
 	}
 	
 }
