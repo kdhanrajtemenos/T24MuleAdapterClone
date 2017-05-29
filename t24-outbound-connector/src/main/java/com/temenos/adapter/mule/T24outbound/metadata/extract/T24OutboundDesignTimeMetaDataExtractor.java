@@ -4,11 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
-
-
+import com.temenos.adapter.common.metadata.MetadataSchema;
 import com.temenos.adapter.common.runtime.outbound.T24ServiceXmlMetadataImpl;
 import com.temenos.adapter.mule.T24outbound.config.ConnectorConfig;
 import com.temenos.adapter.mule.T24outbound.metadata.extract.T24OutboundAPICall;
@@ -138,8 +140,13 @@ public class T24OutboundDesignTimeMetaDataExtractor extends T24BaseOutboundMetad
 		
 		String outSchemaFolder = ioProcessor.createDirectory(fullPath, OUTPUT_SCHEMA_FOLDER_NAME); //api/Schemas/Output
 		
+		Map<String, MetadataSchema> importedIpSchemas = new HashMap<String, MetadataSchema>();
+		
+		Map<String, MetadataSchema> importedOpSchemas = new HashMap<String, MetadataSchema>();
+		
 		for(ServiceXMLMetadataModel model : this.getOnlySelectable()){
-
+			importedIpSchemas.putAll(model.getImportedInputSchemas());
+			importedOpSchemas.putAll(model.getImportedOutputSchemas());
 			Properties prop = new Properties();	
 			prop.put(ROOT_NAME_REQUEST_KEY, model.getRootNameRequest());
 			prop.put(ROOT_NAME_RESPONSE_KEY,  model.getRootNameResponse());
@@ -164,6 +171,28 @@ public class T24OutboundDesignTimeMetaDataExtractor extends T24BaseOutboundMetad
 				e.printStackTrace();
 			}
 			
+		}
+		
+		for (Entry<String, MetadataSchema> importedIpSchema : importedIpSchemas.entrySet()) {
+			String inSchemaFile = inSchemaFolder + File.separatorChar + INPUT_FILE_SHEMA_PREFIX
+					+ importedIpSchema.getValue().getLocation();
+			String inSchemaEnc = importedIpSchema.getValue().getContent();
+			try {
+				ioProcessor.writeSchemas(inSchemaFile, inSchemaEnc);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		for (Entry<String, MetadataSchema> importedOpSchema : importedOpSchemas.entrySet()) {
+			String outSchemaFile = outSchemaFolder + File.separatorChar + OUTPUT_FILE_SHEMA_PREFIX
+					+ importedOpSchema.getValue().getLocation();
+			String outSchemaEnc = importedOpSchema.getValue().getContent();
+			try {
+				ioProcessor.writeSchemas(outSchemaFile, outSchemaEnc);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
