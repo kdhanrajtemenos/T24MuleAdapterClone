@@ -222,4 +222,18 @@
             <layout>default</layout>
         </repository>
     </repositories>
+    
+	<distributionManagement>
+		<repository>
+			<id>nexus-t24</id>
+			<name>T24 Releases</name>
+			<url>http://maven.temenosgroup.com/content/repositories/t24-releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>nexus-t24</id>
+			<name>T24 Snapshots</name>
+			<url>http://maven.temenosgroup.com/content/repositories/t24-snapshots</url>
+		</snapshotRepository>
+	</distributionManagement> 
+	
 </project>
