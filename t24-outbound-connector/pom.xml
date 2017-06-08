@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.mule.modules</groupId>
 	<artifactId>t24-outbound-connector</artifactId>
-	<version>201705.0.0</version>
+	<version>201706.0.0</version>
 	<packaging>mule-module</packaging>
 	<name>Mule T24Outbound Anypoint Connector</name>
 
@@ -17,7 +17,7 @@
 
 	<properties>
 		<category>Community</category>
-		<t24.version>201705.0.0</t24.version>
+		<t24.version>201706.0.0</t24.version>
 		<licensePath>LICENSE.md</licensePath>
 		<devkit.studio.package.skip>false</devkit.studio.package.skip>
 		<jdk.version>1.8</jdk.version>
