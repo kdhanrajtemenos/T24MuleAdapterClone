@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.temenos.technology.integrationframework.adapters.mule</groupId>
     <artifactId>t24-inbound-connector</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
     <packaging>mule-module</packaging>
     <name>Mule T24 Inbound Anypoint Connector</name>
 
