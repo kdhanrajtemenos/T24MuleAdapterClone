@@ -39,11 +39,11 @@ public class InitConnectorConfig {
 	
 	/* FOR SERVICE XML */
 	public static final String OPERATION="OPERATION";	
-	public static final String rootNameRequest="rootNameRequest";
-	public static final String rootNameResponse="rootNameResponse";
-	public static final String serviceOperationAction="serviceOperationAction";
-	public static final String serviceOperationName="serviceOperationName";
-	public static final String serviceOperationTarget="serviceOperationTarget";
+	public static final String ROOTNAMEREQUEST="rootNameRequest";
+	public static final String ROOTNAMERESPONSE="rootNameResponse";
+	public static final String SERVICEOPERATIONACTION="serviceOperationAction";
+	public static final String SERVICEOPERATIONNAME="serviceOperationName";
+	public static final String SERVICEOPERATIONTARGET="serviceOperationTarget";
 	
 
 	/* FOR ALL TEST  FILES */
@@ -60,9 +60,7 @@ public class InitConnectorConfig {
 	public static InitConnectorConfig getInstance(){
 		if(instance==null){
 			synchronized(InitConnectorConfig.class){
-				if(instance==null){
 					instance = new InitConnectorConfig();
-				}
 			}
 		}
 		return instance;

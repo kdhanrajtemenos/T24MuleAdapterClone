@@ -55,7 +55,7 @@ public class TestLandScapeService {
 
         TestLandScapeService test = new TestLandScapeService(config);
 
-        test.config.connect(config.getServiseURL());
+        test.config.connect(config.getServiceURL());
 
         T24MetadataTree tree = (T24MetadataTree) test.getMetadataTree(test.config.getClient(), test.config.getUserWsDeatils());
 
