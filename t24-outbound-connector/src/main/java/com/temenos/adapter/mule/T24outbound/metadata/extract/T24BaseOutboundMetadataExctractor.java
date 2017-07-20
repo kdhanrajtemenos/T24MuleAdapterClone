@@ -10,8 +10,7 @@ import com.temenos.adapter.common.metadata.ServiceOperation;
 import com.temenos.adapter.common.metadata.outbound.T24ServiceOperationImpl;
 import com.temenos.adapter.common.runtime.outbound.T24ServiceXmlMetadataImpl;
 import com.temenos.adapter.mule.T24outbound.config.ConnectorConfig;
-
-
+import com.temenos.adapter.mule.T24outbound.config.RuntimeConfigSelector;
 import com.temenos.adapter.mule.T24outbound.metadata.model.Metadata;
 import com.temenos.adapter.mule.T24outbound.metadata.model.ServiceXMLMetadataModel;
 import com.temenos.adapter.mule.T24outbound.proxy.IntegrationLandscapeServiceWSclient;
@@ -107,11 +106,11 @@ public class T24BaseOutboundMetadataExctractor {
 	private void initMetaDataExtractor()  {
 		IntegrationLandscapeServiceWSclient client = config.getClient();
 		
-		/*if(config.getT24RunTime().equals(RuntimeConfigSelector.TAFC)) {
-		   outboundCall = new TAFCOutboundAgent(config.getAgentHost(), config.getPort(), client);
-	    }else{*/
+		if(config.getT24RunTime().equals(RuntimeConfigSelector.TAFC)) {
+		   outboundCall = new TAFCOutboundAgent(config.getAgentHost(), Integer.parseInt(config.getAgentPort()), client);
+	    }else{
 	       outboundCall = new TAFJOutboundAgent( config.getUserWsDeatils().getUser().getValue(), config.getUserWsDeatils().getPassword().getValue(), client);
-	    //}
+	    }
 	}
 	
 	/**

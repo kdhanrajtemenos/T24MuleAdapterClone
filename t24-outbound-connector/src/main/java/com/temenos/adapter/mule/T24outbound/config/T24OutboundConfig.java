@@ -34,8 +34,8 @@ public class T24OutboundConfig {
     public static final String WEBLOGIC_EJB_JNDI_OFSCONNECTOR_SERVICE_BEAN_REMOTE_OFS = "ejb/OFSConnectorServiceBeanRemoteOFS";
     public static final String WEBSPHERE_OFS_CONNECTOR_SERVICE_BEAN_REMOTE_TAFJ = "OFSConnectorServiceBeanRemoteTAFJOFS";
 
-	public static final String runtimeVersionTAFJ = "TAFJ";
-	public static final String runtimeVersionTAFC = "TAFC";
+	public static final String RUNTIMEVERSION_TAFJ = "TAFJ";
+	public static final String RUNTIMEVERSION_TAFC = "TAFC";
 	
 	private static final int DEFAULT_MAX_POOL_SIZE = 3;
 	private static final int DEFAULT_MIN_POOL_SIZE = 0;
@@ -129,12 +129,10 @@ public class T24OutboundConfig {
 	public static T24OutboundConfig getInstance() {
 		if (instance == null) {
 			synchronized (T24OutboundConfig.class) {
-				if (instance == null) {
 					instance = new T24OutboundConfig();
 					
 					/* Sets some non user input runtime parameters */
 					instance.setMinimalInitProperties();
-				}
 			}
 		}
 		return instance;
@@ -171,11 +169,11 @@ public class T24OutboundConfig {
 	 * @throws RuntimeException
 	 */
 	public void setRuntime(String runtime, String agentHost, Integer agentport, String username, String password, ServerType serverType, String nodeNames) throws RuntimeException{
-		if(runtime.equals(runtimeVersionTAFJ)){
+		if(runtime.equals(RUNTIMEVERSION_TAFJ)){
 			instance.setConnectionType(T24ConnectionType.resolve(TAFJ_CONNCECTION_TYPE));
 			instance.setRemotingHost(agentHost);
 			instance.setRemotingPort(agentport);
-		}else if (runtime.equals(runtimeVersionTAFC)){
+		}else if (runtime.equals(RUNTIMEVERSION_TAFC)){
 			instance.setConnectionType(T24ConnectionType.resolve(TAFC_CONNCECTION_TYPE));
 			instance.setAgentHosts(agentHost);
 			instance.setAgentPorts(agentport.toString());
@@ -520,7 +518,7 @@ public class T24OutboundConfig {
 	protected ResponseRecord getAdapterResponce(String request, RequestType requestType, T24ServiceXmlMetadata xmlMetadata) throws ConnectionException {
 		
 		T24RuntimeConfiguration config = null;
-		if(this.runtime.equals(runtimeVersionTAFJ)){
+		if(this.runtime.equals(RUNTIMEVERSION_TAFJ)){
 			config = instance.getTafjRuntimeConfiguration(requestType);
 		}else{
 			config = instance.getTafcRuntimeConfiguration();
@@ -564,6 +562,24 @@ public class T24OutboundConfig {
 
 	public void setNodeNames(String nodeNames) {
 		this.nodeNames = nodeNames;
+	}
+
+	public void setTAFCRuntime(ConnectorConfig connectorConfig) {
+		instance.setConnectionType(T24ConnectionType.resolve(TAFC_CONNCECTION_TYPE));
+		instance.setAgentHosts(connectorConfig.getAgentHost());
+		instance.setAgentPorts(connectorConfig.getAgentPort());
+		instance.setAgentUser(connectorConfig.getAgentUsername());
+		instance.setAgentPassword(connectorConfig.getAgentPwd());
+		instance.setAgentEnvVariables(connectorConfig.getAgentEnvVariables()); //IRISPA IFPA ???
+		instance.setAgentSSL(Boolean.valueOf(connectorConfig.getAgentSSL()));
+		instance.setAgentCharset(connectorConfig.getAgentCharset());
+		instance.setAgentNaiveTrustManager(Boolean.valueOf(connectorConfig.getAgentNaiveTrustManager()));
+		instance.setAgentIdleTimeout(DEFAULT_IDLE_TIMEOUT);
+		instance.setAgentMinPoolSize(DEFAULT_MIN_POOL_SIZE);
+		instance.setAgentMaxPoolSize(DEFAULT_MAX_POOL_SIZE);
+		instance.setAgentActionTimeout(DEFAULT_ACTION_TIMEOUT);
+		instance.setAgentPoolingEnabled(true); 
+		instance.setRuntimeVersion(runtime);
 	}
 	
 

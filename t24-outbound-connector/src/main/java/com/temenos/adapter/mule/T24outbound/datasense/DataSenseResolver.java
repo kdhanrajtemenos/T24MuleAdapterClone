@@ -23,6 +23,7 @@ import org.mule.common.metadata.builder.DynamicObjectBuilder;
 import org.mule.common.metadata.datatype.DataType;
 
 import com.temenos.adapter.mule.T24outbound.config.ConnectorConfig;
+import com.temenos.adapter.mule.T24outbound.config.RuntimeConfigSelector;
 import com.temenos.adapter.mule.T24outbound.connector.T24OutboundConnector;
 import com.temenos.adapter.mule.T24outbound.metadata.extract.T24OutboundDesignTimeMetaDataExtractor;
 
@@ -56,9 +57,11 @@ public class DataSenseResolver {
     		if(config==null ){
     			throw new ConnectionException(ConnectionExceptionCode.UNKNOWN, "301", "Connector config is unavailable!");
     		}
-    		
-    		config.initIntegrationServiceLandscape(config.getServiseURL());
-    		
+    		if(RuntimeConfigSelector.TAFC.equals(config.getT24RunTime())){
+    			config.initIntegrationAgentLandscape();
+    		}else if(RuntimeConfigSelector.TAFJ.equals(config.getT24RunTime())){
+    			config.initIntegrationServiceLandscape(config.getServiceURL());
+    		}    		
     		
     		if(!config.isConnected()){
     			throw new ConnectionException(ConnectionExceptionCode.UNKNOWN, "302", "Connector is not connected. Can't get MetaDataKeys!");
