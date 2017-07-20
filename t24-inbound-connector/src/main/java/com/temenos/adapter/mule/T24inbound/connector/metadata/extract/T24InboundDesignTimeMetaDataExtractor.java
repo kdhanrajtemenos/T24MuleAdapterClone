@@ -8,9 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
-import com.temenos.adapter.mule.T24inbound.connector.config.ConnectorConfig;
+import com.temenos.adapter.mule.T24inbound.connector.config.AbstractConnectorConfig;
 import com.temenos.adapter.mule.T24inbound.connector.metadata.model.InboundMetadataModel;
 import com.temenos.adapter.mule.T24inbound.connector.metadata.model.Metadata;
 import com.temenos.adapter.mule.T24inbound.connector.metadata.model.MetadataSchema;
@@ -27,7 +26,7 @@ public class T24InboundDesignTimeMetaDataExtractor extends T24BaseInboundMetadat
 	 * Constructor
 	 * @param config - inject the connector configuration
 	 */
-	public T24InboundDesignTimeMetaDataExtractor(ConnectorConfig config){
+	public T24InboundDesignTimeMetaDataExtractor(AbstractConnectorConfig config){
 		super(config);
 
 	}

@@ -7,7 +7,7 @@ import org.mule.api.transaction.Transaction;
 import org.mule.config.i18n.CoreMessages;
 import org.mule.transaction.TransactionCoordination;
 
-import com.temenos.adapter.mule.T24inbound.connector.config.ConnectorConfig;
+import com.temenos.adapter.mule.T24inbound.connector.config.AbstractConnectorConfig;
 import com.temenos.adapter.mule.T24inbound.connector.rmi.EventPollingService;
 
 public class T24xaUtils {
@@ -18,7 +18,7 @@ public class T24xaUtils {
 	
 	
 	@SuppressWarnings("unchecked")
-	static public <T> T getTransactionalResource(T24xaResourse jtaResourse, ConnectorConfig config){
+	static public <T> T getTransactionalResource(T24xaResourse jtaResourse, AbstractConnectorConfig config){
 		
 		Transaction currentTx = TransactionCoordination.getInstance().getTransaction();
 		
