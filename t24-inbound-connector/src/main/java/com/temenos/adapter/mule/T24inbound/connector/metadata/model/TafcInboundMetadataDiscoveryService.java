@@ -40,7 +40,7 @@ public MetadataTree getMetadataTree(IntegrationFlowServiceWSClient client)
   for (int flowNameIndex = 1; flowNameIndex <= flowNames.getNumberOfAttributes(); flowNameIndex++) {
     metadataTree.addMetadata(new T24InboundMetadata(flowNames.get(flowNameIndex)));
   }
-  //metadataTree.setCompanies(getCompanyList());
+  metadataTree.setCompanies(getCompanyList());
   return metadataTree;
 }
 

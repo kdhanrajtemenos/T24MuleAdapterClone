@@ -4,16 +4,12 @@ package com.temenos.adapter.mule.T24inbound.connector.rmi;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.temenos.adapter.common.conf.AdapterProperties;
 import com.temenos.adapter.common.conf.T24InvalidConfigurationException;
 import com.temenos.adapter.common.conf.T24RuntimeConfiguration;
-import com.temenos.adapter.common.conf.T24RuntimeConfigurationFactory;
-import com.temenos.adapter.common.runtime.RuntimeType;
 import com.temenos.adapter.common.runtime.T24RuntimeException;
 import com.temenos.adapter.common.runtime.TafjServerType;
 import com.temenos.adapter.common.runtime.inbound.EventPollingData;
@@ -22,10 +18,7 @@ import com.temenos.adapter.common.runtime.inbound.T24EventPollingException;
 import com.temenos.adapter.common.runtime.inbound.T24EventPollingService;
 import com.temenos.adapter.common.runtime.inbound.T24InboundServiceProvider;
 import com.temenos.adapter.common.runtime.inbound.T24InboundServiceProviderFactory;
-import com.temenos.adapter.mule.T24inbound.connector.config.AbstractConnectorConfig;
-import com.temenos.adapter.mule.T24inbound.connector.config.RuntimeConfigSelector;
-import com.temenos.adapter.mule.T24inbound.connector.config.TAFCConnectorConfig;
-import com.temenos.adapter.mule.T24inbound.connector.config.TAFJConnectorConfig;
+import com.temenos.adapter.mule.T24inbound.connector.config.ConnectorConfig;
 
 public class EventPollingService {
 	
@@ -41,7 +34,7 @@ public class EventPollingService {
 	
 	//private T24EventPollingService service = null;
 	
-	private AbstractConnectorConfig config;
+	private ConnectorConfig config;
 
 	private String eventType;
 
@@ -51,12 +44,12 @@ public class EventPollingService {
 	private EventPollingData data;
 	
 	
-	private EventPollingService(AbstractConnectorConfig config){
+	private EventPollingService(ConnectorConfig config){
 		this.config = config;
 	       
 	}
 	
-	private EventPollingService(String eventType, int eventCount, AbstractConnectorConfig config) {
+	private EventPollingService(String eventType, int eventCount, ConnectorConfig config) {
 		this.eventType = eventType;
 		this.eventCount = eventCount;
 		this.config = config;
@@ -70,11 +63,14 @@ public class EventPollingService {
 	 * @param config
 	 * @return
 	 */
-	public static EventPollingService getInstance(String eventType, int eventCount, AbstractConnectorConfig config){
+	public static EventPollingService getInstance(String eventType, int eventCount, ConnectorConfig config){
 		
 		if (instance == null) {
 			synchronized (EventPollingService.class) {
+				if (instance == null) {
+
 					instance = new EventPollingService(eventType, eventCount, config).init();
+				}
 			}
 		}
 		return instance;
@@ -85,13 +81,14 @@ public class EventPollingService {
 	 * @param config
 	 * @return
 	 */
-	public static EventPollingService getInstance(AbstractConnectorConfig config){
+	public static EventPollingService getInstance(ConnectorConfig config){
 		
 		if (instance == null) {
 			synchronized (EventPollingService.class) {
+				if (instance == null) {
 
 					instance = new EventPollingService(config).init();
-					
+				}
 			}
 		}
 		return instance;
@@ -106,55 +103,28 @@ public class EventPollingService {
 	 * @throws RuntimeException
 	 */
 	private EventPollingService init() throws RuntimeException {
+		
+		ArrayList<String> hosts = new ArrayList<String>();
+	    ArrayList<Integer> ports = new ArrayList<Integer>();
+	    ArrayList<String> nodes = new ArrayList<String>();
 
-		try {
-			if (config.getRunTime() == RuntimeConfigSelector.TAFJ) {
-				ArrayList<String> hosts = new ArrayList<String>();
-				ArrayList<Integer> ports = new ArrayList<Integer>();
-				ArrayList<String> nodes = new ArrayList<String>();
-				TAFJConnectorConfig connectorConfig = (TAFJConnectorConfig) config;
-				hosts.add(connectorConfig.getT24Host());
-				ports.add(connectorConfig.getT24Port()); // 5456 from oracle config
-				nodes.add(connectorConfig.getNodeName());
-				configT24 = TAFJRuntimeConfigurationBuilder.createTAFJRuntimeConfiguration(
-						TafjServerType.JBOSS_7_2.toString(), hosts, ports, nodes, connectorConfig.getT24User(),
-						connectorConfig.getT24Password(), connectorConfig.getEjbStateful(), "");
-			} else if (config.getRunTime() == RuntimeConfigSelector.TAFC) {
-				TAFCConnectorConfig connectorConfig = (TAFCConnectorConfig) config;
-				configT24 = T24RuntimeConfigurationFactory.buildRuntimeConfiguration(RuntimeType.TAFC,
-						getDefaultTafcConnectionProperties(connectorConfig), getAuthProperties(connectorConfig), true);
-			}
+
+	    hosts.add(config.getT24Host());
+	    ports.add(new Integer(config.getT24Port())); // 5456 from oracle config
+	    nodes.add(config.getNodeName());
+       
+    	try {
+			configT24 = TAFJRuntimeConfigurationBuilder.createTAFJRuntimeConfiguration(
+			        TafjServerType.JBOSS_7_2.toString(),
+			        hosts, ports, nodes, config.getT24User(), 
+			        config.getT24Password(), config.getEjbStateful(), "");
 		} catch (T24InvalidConfigurationException e) {
 			throw new RuntimeException("T24 configuration error: " + e.getMessage());
 		}
-		return this;
+        
+        return this;
 	}
 	
-	
-	private Properties getDefaultTafcConnectionProperties(TAFCConnectorConfig connectorConfig) {
-		Properties props = new Properties();
-		props.put(AdapterProperties.TAFC_HOSTS, connectorConfig.getAgentHost());
-		props.put(AdapterProperties.TAFC_PORTS, connectorConfig.getAgentPort());
-		props.put(AdapterProperties.TAFC_ENV_PROPS, connectorConfig.getAgentEnvVariables());
-		props.put(AdapterProperties.TAFC_ACTION_TIMEOUT,connectorConfig.getAgentActionTimeout());
-		props.put(AdapterProperties.TAFC_CHARSET, "UTF-8");
-		props.put(AdapterProperties.TAFC_IDLE_TIMEOUT, "300");
-		props.put(AdapterProperties.TAFC_POOLING_ENABLED, "false");
-		props.put(AdapterProperties.TAFC_LOAD_BALANCING, "false");
-		props.put(AdapterProperties.TAFC_MIN_POOL_SIZE, "1");
-		props.put(AdapterProperties.TAFC_MAX_POOL_SIZE, "3");
-		props.put(AdapterProperties.TAFC_SSL,"false");
-		props.put(AdapterProperties.TAFC_TRUST_MANAGER, "false");
-		return props;
-	}
-	
-	private Properties getAuthProperties(TAFCConnectorConfig connectorConfig) {
-		Properties authProperties = new Properties();
-		authProperties.put(AdapterProperties.T24_AUTH_USER_NAME,connectorConfig.getAgentUser() );
-		authProperties.put(AdapterProperties.T24_AUTH_PASSWORD,connectorConfig.getAgentPassword());
-		
-		return authProperties;
-	}
 	
     T24EventPollingService service = null;
 	
@@ -173,7 +143,7 @@ public class EventPollingService {
 
 	    //T24InboundServiceProvider provider = T24InboundServiceProviderFactory.getServiceProvider(configT24);
 		// use deprecated method to eliminate company name
-	    T24InboundServiceProvider provider = T24InboundServiceProviderFactory.getServiceProvider(eventType,i,configT24);
+	    T24InboundServiceProvider provider = T24InboundServiceProviderFactory.getServiceProvider(eventType, i, configT24);
 	    
 		List<T24Event> result = null;
 		
@@ -181,7 +151,6 @@ public class EventPollingService {
 			
 			//service = provider.getService(data);
 			// use deprecated method to eliminate company name
-			 
 			service = provider.getService();
 	
 			service.begin();

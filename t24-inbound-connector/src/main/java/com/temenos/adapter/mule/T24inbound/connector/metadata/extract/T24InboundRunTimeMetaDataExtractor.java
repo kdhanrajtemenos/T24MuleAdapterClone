@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 //import java.util.Properties;
 
-import com.temenos.adapter.mule.T24inbound.connector.config.AbstractConnectorConfig;
+import com.temenos.adapter.mule.T24inbound.connector.config.ConnectorConfig;
 import com.temenos.adapter.mule.T24inbound.connector.metadata.model.InboundMetadataModel;
 import com.temenos.adapter.mule.T24inbound.connector.metadata.model.Metadata;
 
@@ -16,7 +16,7 @@ public class T24InboundRunTimeMetaDataExtractor extends T24BaseInboundMetadataEx
 	 * Constructor
 	 * @param config - inject the connector configuration
 	 */
-	public T24InboundRunTimeMetaDataExtractor(AbstractConnectorConfig config){
+	public T24InboundRunTimeMetaDataExtractor(ConnectorConfig config){
 		super(config);
 	}	
 	

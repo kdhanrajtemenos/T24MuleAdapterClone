@@ -5,10 +5,9 @@ import java.util.Collection;
 import java.util.List;
 //import java.util.Properties;
 
-import com.temenos.adapter.mule.T24inbound.connector.config.AbstractConnectorConfig;
-import com.temenos.adapter.mule.T24inbound.connector.config.RuntimeConfigSelector;
-import com.temenos.adapter.mule.T24inbound.connector.config.TAFCConnectorConfig;
-import com.temenos.adapter.mule.T24inbound.connector.config.TAFJConnectorConfig;
+import com.temenos.adapter.mule.T24inbound.connector.config.ConnectorConfig;
+import com.temenos.adapter.mule.T24inbound.connector.metadata.extract.T24InboundAPICall;
+import com.temenos.adapter.mule.T24inbound.connector.metadata.extract.TAFJInboundAgent;
 import com.temenos.adapter.mule.T24inbound.connector.metadata.model.InboundMetadataModel;
 import com.temenos.adapter.mule.T24inbound.connector.metadata.model.Metadata;
 import com.temenos.adapter.mule.T24inbound.connector.proxy.IntegrationFlowServiceWSClient;
@@ -46,7 +45,7 @@ public class T24BaseInboundMetadataExctractor {
 	private T24InboundAPICall inboundCall;
 	
 	/* Injected Connector configuration */
-	private AbstractConnectorConfig config;
+	private ConnectorConfig config;
 	
 	/* The metadata tree*/
 	private Collection<Metadata> eventsCollection;
@@ -57,7 +56,7 @@ public class T24BaseInboundMetadataExctractor {
 	/* debug flag */
 	private boolean debug;
 
-	public T24BaseInboundMetadataExctractor(AbstractConnectorConfig config2) {
+	public T24BaseInboundMetadataExctractor(ConnectorConfig config2) {
 		this.config = config2;
 		initMetaDataExtractor();
 	}
@@ -70,11 +69,11 @@ public class T24BaseInboundMetadataExctractor {
 		this.inboundCall = inboundCall;
 	}
 
-	public AbstractConnectorConfig getConfig() {
+	public ConnectorConfig getConfig() {
 		return config;
 	}
 
-	public void setConfig(AbstractConnectorConfig config) {
+	public void setConfig(ConnectorConfig config) {
 		this.config = config;
 	}
 
@@ -103,16 +102,9 @@ public class T24BaseInboundMetadataExctractor {
 	}
 	
 	private void initMetaDataExtractor()  {
-		if (RuntimeConfigSelector.TAFC == config.getRunTime()) {
-			TAFCConnectorConfig tafcConnectorConfig = (TAFCConnectorConfig) config;
-			inboundCall = new TAFCInboundAgent(tafcConnectorConfig.getAgentHost(), tafcConnectorConfig.getAgentPort(), null);
-		} else if (RuntimeConfigSelector.TAFJ == config.getRunTime()) {
-			TAFJConnectorConfig tafjConnectorConfig = (TAFJConnectorConfig) config;
-			IntegrationFlowServiceWSClient client = tafjConnectorConfig.getClient();
-			inboundCall = new TAFJInboundAgent(tafjConnectorConfig.getUserWsDeatils().getUser().getValue(),
-					tafjConnectorConfig.getUserWsDeatils().getPassword().getValue(), client);
-		}
-
+		IntegrationFlowServiceWSClient client = config.getClient();
+		
+    	inboundCall = new TAFJInboundAgent( config.getUserWsDeatils().getUser().getValue(), config.getUserWsDeatils().getPassword().getValue(), client);
 
 	}
 	
