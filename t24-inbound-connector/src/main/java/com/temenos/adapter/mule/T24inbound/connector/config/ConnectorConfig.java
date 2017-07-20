@@ -1,5 +1,30 @@
 package com.temenos.adapter.mule.T24inbound.connector.config;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Properties;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.api.ConnectionException;
+import org.mule.api.ConnectionExceptionCode;
+import org.mule.api.annotations.Configurable;
+import org.mule.api.annotations.Connect;
+import org.mule.api.annotations.ConnectionIdentifier;
+import org.mule.api.annotations.Disconnect;
+import org.mule.api.annotations.Required;
+import org.mule.api.annotations.TestConnectivity;
+import org.mule.api.annotations.ValidateConnection;
+import org.mule.api.annotations.components.ConnectionManagement;
+import org.mule.api.annotations.display.FriendlyName;
+import org.mule.api.annotations.display.Password;
+import org.mule.api.annotations.display.Path;
+import org.mule.api.annotations.display.Placement;
+import org.mule.api.annotations.display.Summary;
+import org.mule.api.annotations.param.ConnectionKey;
+import org.mule.api.annotations.param.Default;
+
 import com.temenos.adapter.mule.T24inbound.connector.proxy.IntegrationFlowServiceWSClient;
 import com.temenos.adapter.mule.T24inbound.connector.proxy.ServiceEndPointType;
 import com.temenos.adapter.mule.T24inbound.connector.utils.AddressChecker;
@@ -8,25 +33,12 @@ import com.temenos.soa.services.data.xsd.ObjectFactory;
 import com.temenos.soa.services.data.xsd.Response;
 import com.temenos.soa.services.data.xsd.ResponseDetails;
 import com.temenos.soa.services.data.xsd.T24UserDetails;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.mule.api.ConnectionException;
-import org.mule.api.ConnectionExceptionCode;
-import org.mule.api.annotations.*;
-import org.mule.api.annotations.components.ConnectionManagement;
-import org.mule.api.annotations.display.*;
-import org.mule.api.annotations.param.ConnectionKey;
-import org.mule.api.annotations.param.Default;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Properties;
 
 //import javax.transaction.TransactionManager;
 
 
 @ConnectionManagement(configElementName = "config", friendlyName = "Connection type parameters")
+@Deprecated()
 public class ConnectorConfig {
 
     protected final transient Log log = LogFactory.getLog(getClass());
@@ -36,6 +48,7 @@ public class ConnectorConfig {
 
     public static final String DEFAULT_SETTINGS_FILE_NAME = "settings.txt";
 
+    private boolean isWebserviceAddedToURI;
 
     /**
      * Holding the SOAP User credentials
@@ -57,7 +70,7 @@ public class ConnectorConfig {
      */
     @Configurable
     @Default(value = "4447")
-    @Placement(order = 3, group = "Connector Runtime Configuration", tab = "Runtime")
+    @Placement(order = 3, group = "Connector Runtime Configuration", tab = "TAFJ Runtime")
     @FriendlyName("T24 Port")
     @Summary("T24 runtime connection port value")
     private Integer t24Port;
@@ -77,7 +90,7 @@ public class ConnectorConfig {
     @Configurable
     @Required
     @Default(value = "localhost")
-    @Placement(order = 2, group = "Connector Runtime Configuration", tab = "Runtime")
+    @Placement(order = 2, group = "Connector Runtime Configuration", tab = "TAFJ Runtime")
     @FriendlyName("T24 Host")
     @Summary("T24 runtime connection host name")
     private String t24Host;
@@ -97,7 +110,7 @@ public class ConnectorConfig {
     @Configurable
     @Required
     @Default(value = "SSOUSER1")
-    @Placement(order = 4, group = "Connector Runtime Configuration", tab = "Runtime")
+    @Placement(order = 4, group = "Design Time", tab = "General")
     @FriendlyName("T24 User")
     @Summary("T24 runtime connection user name")
     private String t24User;
@@ -110,7 +123,6 @@ public class ConnectorConfig {
         this.t24User = t24User;
     }
 
-
     /**
      * Sets a text filed in the design-time connector configuration window
      * for inputting the T24 Runtime password
@@ -119,12 +131,13 @@ public class ConnectorConfig {
     @Required
     @Password
     @Default(value = "123456")
-    @Placement(order = 5, group = "Connector Runtime Configuration", tab = "Runtime")
+    @Placement(order = 5, group = "Connector Runtime Configuration", tab = "TAFJ Runtime")
     @FriendlyName("T24 Password")
     @Summary("T24 runtime connection user password")
     private String t24Password;
 
-    public String getT24Password() {
+
+	public String getT24Password() {
         return t24Password;
     }
 
@@ -138,7 +151,7 @@ public class ConnectorConfig {
      */
     @Configurable
     @Default(value = "JBOSS72")
-    @Placement(order = 1, group = "Connector Runtime Configuration", tab = "Runtime")
+    @Placement(order = 1, group = "Connector Runtime Configuration", tab = "TAFJ Runtime")
     @FriendlyName("T24 Server Type")
     @Summary("T24 instance application server type")
     private RuntimeConfigServerSelector t24RunTime;
@@ -155,7 +168,7 @@ public class ConnectorConfig {
     @Configurable
     @Default("node1")
     @FriendlyName("T24 Jboss Node")
-    @Placement(order = 6, group = "Connector Runtime Configuration", tab = "Runtime")
+    @Placement(order = 6, group = "Connector Runtime Configuration", tab = "TAFJ Runtime")
     @Summary("T24 JBoss server node name")
     private String nodeName;
 
@@ -170,7 +183,7 @@ public class ConnectorConfig {
     @Configurable
     @Default("true")
     @FriendlyName("T24 Ejb Stateful")
-    @Placement(order = 7, group = "Connector Runtime Configuration", tab = "Runtime")
+    @Placement(order = 7, group = "Connector Runtime Configuration", tab = "TAFJ Runtime")
     @Summary("T24 ejb stateful option")
     private Boolean ejbStateful;
 
@@ -185,7 +198,7 @@ public class ConnectorConfig {
     @Configurable
     @Default("")
     @FriendlyName("T24 Ejb Bean Name")
-    @Placement(order = 8, group = "Connector Runtime Configuration", tab = "Runtime")
+    @Placement(order = 8, group = "Connector Runtime Configuration", tab = "TAFJ Runtime")
     @Summary("T24 JNDI ejb name")
     private String ejbName;
 
@@ -231,14 +244,21 @@ public class ConnectorConfig {
         this.settingsFileName = settingsFileName;
     }
 
-    private String serviseURL;
+    /**
+     * Web service credentials User name
+     */
+    @Configurable
+    @Default(WS_HOST)
+    @Required
+    @Placement(order = 1, group = "Design Time", tab = "General")
+    private String serviceURL;
 
-    public String getServiseURL() {
-        return serviseURL;
+    public String getServiceURL() {
+        return serviceURL;
     }
 
-    public void setServiseURL(String serviseURL) {
-        this.serviseURL = serviseURL;
+    public void setServiceURL(String serviceURL) {
+        this.serviceURL = serviceURL;
     }
 
     /**
@@ -266,7 +286,7 @@ public class ConnectorConfig {
     @Configurable
     @Default("INPUTT")
     @Required
-    @Placement(order = 1, group = "Connection", tab = "General")
+    @Placement(order = 1, group = "Design Time", tab = "General")
     private String serviceUserName;
 
     public String getServiceUserName() {
@@ -285,7 +305,7 @@ public class ConnectorConfig {
     @Default("123456")
     @Required
     @Password
-    @Placement(order = 2, group = "Connection", tab = "General")
+    @Placement(order = 2, group = "Design Time", tab = "General")
     private String servicePassword;
 
     public String getServicePassword() {
@@ -316,17 +336,17 @@ public class ConnectorConfig {
 
      */
 
-    /**
+   /* *//**
      * Sets the connector configuration file and location which is used to store the connection setting,
      * and to define path to the folder where input and output schemas will be stored when metadata
      * discovery is used for Service Xml request.
      */
+
     @Configurable
-    @Path
+    @Default(value = DEFAULT_SETTINGS_FILE_NAME)
     @Required
-    @Default(DEFAULT_SETTINGS_FILE_NAME)
-    @Placement(order = 1, group = "Save Connection Setting", tab = "General")
-    @FriendlyName("Settings File Location")
+    @Path
+    @Placement(order = 1, group = "Save Connection settings", tab = "General")
     private String settingsFilePath;
 
     public String getSettingsFilePath() {
@@ -338,6 +358,15 @@ public class ConnectorConfig {
     }
 
 
+    private RuntimeConfigSelector runTime;
+
+    public RuntimeConfigSelector getRunTime() {
+        return runTime;
+    }
+
+    public void setRunTime(RuntimeConfigSelector t24RunTime) {
+        this.runTime = t24RunTime;
+    }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////	
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -348,10 +377,12 @@ public class ConnectorConfig {
      * @throws ConnectionException
      */
     @TestConnectivity(label = "Test and Save Settings")
-    public void testConnect(@ConnectionKey @Default("http://localhost:9089/axis2/services") String serviceUrl
-    ) throws ConnectionException {
+    public void testConnect(@ConnectionKey @Default("TAFJ") String connectionType
+    	    ) throws ConnectionException {
 
-        if (!verifyUserInput(serviceUserName, serviceUrl, settingsFilePath)) {
+    	this.runTime = RuntimeConfigSelector.valueOf(connectionType);
+    	setSettingsFilePath(getSettingsFileName());
+        if (!verifyUserInput(serviceUserName, serviceURL, settingsFilePath)) {
             throw new ConnectionException(ConnectionExceptionCode.CANNOT_REACH, "111", "Incorrect input parameters!");
         }
 
@@ -363,13 +394,13 @@ public class ConnectorConfig {
 
         splitFullFileName();
 
-        if (serviceUrl.trim().length() == 0) {
-            serviceUrl = WS_HOST;
+        if (serviceURL.trim().length() == 0) {
+        	serviceURL = WS_HOST;
         }
 
-        setServiseURL(serviceUrl + WS_NAME);
+        setServiceURL(serviceURL + WS_NAME);
 
-        initIntegrationServiceFlow(serviceUrl + WS_NAME);
+        initIntegrationServiceFlow(serviceURL + WS_NAME);
 
         //setWsConnectorUser(username, ui.getServicePassword(), coCode);
         setWsConnectorUser(serviceUserName, servicePassword);
@@ -422,14 +453,15 @@ public class ConnectorConfig {
     private boolean loadedFromFile = false;
 
     @Connect
-    public void connect(@ConnectionKey @Default("http://localhost:9089/axis2/services") String serviceUrl
+    public void connect(@ConnectionKey @Default("TAFJ") String runTime
     ) throws ConnectionException {
 
         if (loadedFromFile) { // single loading of configuration
             return;
         }
-
+        this.runTime = RuntimeConfigSelector.valueOf(runTime);
         ////Modified////
+        
         splitFullFileName();
 
         // remove configuration from properties loading
@@ -438,11 +470,13 @@ public class ConnectorConfig {
         loadedFromFile = false;
 
 
-        if (serviceUrl.trim().length() == 0) {
-            serviceUrl = WS_HOST;
+        if (serviceURL.trim().length() == 0) {
+        	serviceURL = WS_HOST;
         }
-        setServiseURL(serviceUrl + WS_NAME);
-
+        if (!isWebserviceAddedToURI) {
+        	setServiceURL(serviceURL + WS_NAME);
+        	isWebserviceAddedToURI = true;
+        }
 //		if(!verifyUserInput(username, serviceUrl, emptyCredentialFile, coCode)){
 //			throw new ConnectionException(ConnectionExceptionCode.CANNOT_REACH,"111","Incorrect input parameters!");
 //		}
@@ -596,4 +630,334 @@ public class ConnectorConfig {
         }
     }
 
+    @Configurable
+	@Default(value = "localhost")
+	@Required
+	@Placement(order = 2, group = "Design Time", tab = "General")
+	@FriendlyName("T24 Agent Host")
+	@Summary("T24 Agent Host")
+	private String agentHost;
+	
+	@Configurable
+	@Default(value = "20002")
+	@Required
+	@Placement(order = 3, group = "Design Time", tab = "General")
+	@FriendlyName("T24 Agent Port")
+	@Summary("T24 Agent Ports")
+	private String agentPort;
+	
+	@Configurable
+	@Default(value = "20002")
+	@Required
+	@Placement(order = 1, group = "TAFC Connector Runtime Configuration", tab = "TAFC Runtime")
+	@FriendlyName("T24 Agent Enviroment Var")
+	@Summary("T24 Agent Enviroment Var")
+	private String agentEnvVariables;
+	
+	@Configurable
+	@Default(value = "20002")
+	@Required
+	@Placement(order = 2, group = "TAFC Connector Runtime Configuration", tab = "TAFC Runtime")
+	@FriendlyName("T24 Agent Action TimeOut")
+	@Summary("T24 Agent Action TimeOut")
+	private String agentActionTimeout;
+	
+	@Configurable
+	@Default(value = "20002")
+	@Required
+	@Placement(order = 3, group = "TAFC Connector Runtime Configuration", tab = "TAFC Runtime")
+	@FriendlyName("T24 Agent User")
+	@Summary("T24 Agent User")
+	private String agentUser;
+	
+	@Configurable
+    @Default(value = "20002")
+    @Required
+    @Password
+    @Placement(order = 4, group = "TAFC Connector Runtime Configuration", tab = "TAFC Runtime")
+    @FriendlyName("T24 Agent Password")
+    @Summary("T24 Agent Password")
+	private String agentPassword;
+	
+	@Configurable
+    @Default(value = "20002")
+    @Required
+    @Placement(order = 5, group = "TAFC Connector Runtime Configuration", tab = "TAFC Runtime")
+    @FriendlyName("T24 Agent Load Balancing")
+    @Summary("T24 Agent Load Balancing")
+	private String agentLoadBalancing;
+	
+	@Configurable
+    @Default(value = "20002")
+    @Required
+    @Placement(order = 6, group = "TAFC Connector Runtime Configuration", tab = "TAFC Runtime")
+    @FriendlyName("T24 Agent Allow Inputs")
+    @Summary("T24 Agent Allow Inputs")
+	private String agentAllowInput;
+	
+	@Configurable
+    @Default(value = "20002")
+    @Required
+    @Placement(order = 7, group = "TAFC Connector Runtime Configuration", tab = "TAFC Runtime")
+    @FriendlyName("T24 Agent Compression")
+    @Summary("T24 Agent Compression")
+	private String agentCompression;
+	
+	@Configurable
+    @Default(value = "20002")
+    @Required
+    @Placement(order = 8, group = "TAFC Connector Runtime Configuration", tab = "TAFC Runtime")
+    @FriendlyName("T24 Agent Compression Threshold")
+    @Summary("T24 Agent Compression Threshold")
+	private String agentCompressionThreshold;
+	
+	@Configurable
+    @Default(value = "20002")
+    @Required
+    @Placement(order = 9, group = "TAFC Connector Runtime Configuration", tab = "TAFC Runtime")
+    @FriendlyName("T24 Agent Charset")
+    @Summary("T24 Agent Charset")
+	private String agentCharset;
+	
+	@Configurable
+    @Default(value = "20002")
+    @Required
+    @Placement(order = 10, group = "TAFC Connector Runtime Configuration", tab = "TAFC Runtime")
+    @FriendlyName("T24 Agent Trust Manager")
+    @Summary("T24 Agent Trust Manager")
+	private String agentNaiveTrustManager;
+	
+	@Configurable
+    @Default(value = "20002")
+    @Required
+    @Placement(order = 11, group = "TAFC Connector Runtime Configuration", tab = "TAFC Runtime")
+    @FriendlyName("T24 Agent SSL")
+    @Summary("T24 Agent SSL")
+	private String agentSSL;
+	
+	@Configurable
+    @Default(value = "20002")
+    @Required
+    @Placement(order = 12, group = "TAFC Connector Runtime Configuration", tab = "TAFC Runtime")
+    @FriendlyName("T24 Agent Connection Type")
+    @Summary("T24 Agent Connection Type")
+    private String connectionType;
+	
+	@Configurable
+    @Default(value = "20002")
+    @Required
+    @Placement(order = 13, group = "TAFC Connector Runtime Configuration", tab = "TAFC Runtime")
+    @FriendlyName("T24 Agent Url Package Prefix")
+    @Summary("T24 Agent Url Package Prefix")
+    private String urlPackagePrefixes;
+
+    /**
+	 * @return the agentHost
+	 */
+	public String getAgentHost() {
+		return agentHost;
+	}
+
+	/**
+	 * @param agentHosts the agentHost to set
+	 */
+	public void setAgentHost(String agentHost) {
+		this.agentHost = agentHost;
+	}
+
+	/**
+	 * @return the agentPort
+	 */
+	public String getAgentPort() {
+		return agentPort;
+	}
+
+	/**
+	 * @param agentPort the agentPort to set
+	 */
+	public void setAgentPort(String agentPort) {
+		this.agentPort = agentPort;
+	}
+
+	/**
+	 * @return the agentEnvVariables
+	 */
+	public String getAgentEnvVariables() {
+		return agentEnvVariables;
+	}
+
+	/**
+	 * @param agentEnvVariables the agentEnvVariables to set
+	 */
+	public void setAgentEnvVariables(String agentEnvVariables) {
+		this.agentEnvVariables = agentEnvVariables;
+	}
+
+	/**
+	 * @return the agentActionTimeout
+	 */
+	public String getAgentActionTimeout() {
+		return agentActionTimeout;
+	}
+
+	/**
+	 * @param agentActionTimeout the agentActionTimeout to set
+	 */
+	public void setAgentActionTimeout(String agentActionTimeout) {
+		this.agentActionTimeout = agentActionTimeout;
+	}
+
+	/**
+	 * @return the agentUser
+	 */
+	public String getAgentUser() {
+		return agentUser;
+	}
+
+	/**
+	 * @param agentUser the agentUser to set
+	 */
+	public void setAgentUser(String agentUser) {
+		this.agentUser = agentUser;
+	}
+
+	/**
+	 * @return the agentPassword
+	 */
+	public String getAgentPassword() {
+		return agentPassword;
+	}
+
+	/**
+	 * @param agentPassword the agentPassword to set
+	 */
+	public void setAgentPassword(String agentPassword) {
+		this.agentPassword = agentPassword;
+	}
+
+	/**
+	 * @return the agentLoadBalancing
+	 */
+	public String getAgentLoadBalancing() {
+		return agentLoadBalancing;
+	}
+
+	/**
+	 * @param agentLoadBalancing the agentLoadBalancing to set
+	 */
+	public void setAgentLoadBalancing(String agentLoadBalancing) {
+		this.agentLoadBalancing = agentLoadBalancing;
+	}
+
+	/**
+	 * @return the agentAllowInput
+	 */
+	public String getAgentAllowInput() {
+		return agentAllowInput;
+	}
+
+	/**
+	 * @param agentAllowInput the agentAllowInput to set
+	 */
+	public void setAgentAllowInput(String agentAllowInput) {
+		this.agentAllowInput = agentAllowInput;
+	}
+
+	/**
+	 * @return the agentCompression
+	 */
+	public String getAgentCompression() {
+		return agentCompression;
+	}
+
+	/**
+	 * @param agentCompression the agentCompression to set
+	 */
+	public void setAgentCompression(String agentCompression) {
+		this.agentCompression = agentCompression;
+	}
+
+	/**
+	 * @return the agentCompressionThreshold
+	 */
+	public String getAgentCompressionThreshold() {
+		return agentCompressionThreshold;
+	}
+
+	/**
+	 * @param agentCompressionThreshold the agentCompressionThreshold to set
+	 */
+	public void setAgentCompressionThreshold(String agentCompressionThreshold) {
+		this.agentCompressionThreshold = agentCompressionThreshold;
+	}
+
+	/**
+	 * @return the agentCharset
+	 */
+	public String getAgentCharset() {
+		return agentCharset;
+	}
+
+	/**
+	 * @param agentCharset the agentCharset to set
+	 */
+	public void setAgentCharset(String agentCharset) {
+		this.agentCharset = agentCharset;
+	}
+
+	/**
+	 * @return the agentNaiveTrustManager
+	 */
+	public String getAgentNaiveTrustManager() {
+		return agentNaiveTrustManager;
+	}
+
+	/**
+	 * @param agentNaiveTrustManager the agentNaiveTrustManager to set
+	 */
+	public void setAgentNaiveTrustManager(String agentNaiveTrustManager) {
+		this.agentNaiveTrustManager = agentNaiveTrustManager;
+	}
+
+	/**
+	 * @return the agentSSL
+	 */
+	public String getAgentSSL() {
+		return agentSSL;
+	}
+
+	/**
+	 * @param agentSSL the agentSSL to set
+	 */
+	public void setAgentSSL(String agentSSL) {
+		this.agentSSL = agentSSL;
+	}
+
+	/**
+	 * @return the connectionType
+	 */
+	public String getConnectionType() {
+		return connectionType;
+	}
+
+	/**
+	 * @param connectionType the connectionType to set
+	 */
+	public void setConnectionType(String connectionType) {
+		this.connectionType = connectionType;
+	}
+
+	/**
+	 * @return the urlPackagePrefixes
+	 */
+	public String getUrlPackagePrefixes() {
+		return urlPackagePrefixes;
+	}
+
+	/**
+	 * @param urlPackagePrefixes the urlPackagePrefixes to set
+	 */
+	public void setUrlPackagePrefixes(String urlPackagePrefixes) {
+		this.urlPackagePrefixes = urlPackagePrefixes;
+	}
 }

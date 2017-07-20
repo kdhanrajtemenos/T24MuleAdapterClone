@@ -17,7 +17,7 @@
     <properties>
         <category>Community</category>
         <licensePath>LICENSE.md</licensePath>
-		<t24.version>DEV.0.0-SNAPSHOT</t24.version>
+		<t24.version>201705.0.0</t24.version>
         <!-- Maven should build the update site Zip file -->
 		<devkit.studio.package.skip>false</devkit.studio.package.skip>
 		<jdk.version>1.8</jdk.version>
@@ -60,6 +60,17 @@
 			<scope>compile</scope>
 		</dependency>
 		
+		<dependency>
+		<groupId>com.temenos.technology</groupId>
+		<artifactId>tocfframework</artifactId>
+		<version>DEV.0.0-SNAPSHOT</version>
+	</dependency> 
+		<dependency>
+   <groupId>org.jencks</groupId>
+   <artifactId>jencks</artifactId>
+   <version>2.0</version>
+	</dependency> 
+		
 		<!-- TEMENOS TAFJ SUPPORT -->
 		<dependency>
 		    <groupId>com.temenos.tafj</groupId>
@@ -73,6 +84,11 @@
 			</exclusions>
 		</dependency>
 		
+		<dependency>
+  	<groupId>com.temenos.t24.external.service.if_integrationframeworkservice.ws</groupId>
+	  <artifactId>t24-IF_IntegrationFrameworkService-provider</artifactId>
+  	<version>201707.0.0</version>
+	</dependency>
 		<!-- THIS IS EXTRNAL LOG4J -->
 		<dependency>
 			<groupId>log4j</groupId>
@@ -157,21 +173,41 @@
 							<include>com.temenos.technology.integrationframework:t24-adapter-common</include>
 							<!-- try to include this version of log4j -->
 							<include>org.apache.log4j:org-apache-log4j</include>
+								<include>org.springframework:spring</include>
 						</includes>
 
 					</artifactSet>
 					<relocations>
 						<relocation>
 							<pattern>org.apache.commons.lang3</pattern>
-							<shadedPattern>org.shaded.commons.lang3</shadedPattern>
+							<shadedPattern>shaded.org.commons.lang3</shadedPattern>
 						</relocation>
 						<!-- try to relocate old version of log4j -->
 						<relocation>
 							<pattern>org.apache.log4j</pattern>
-							<shadedPattern>org.apache.log4j.shaded</shadedPattern>
+							<shadedPattern>shaded.org.apache.log4j</shadedPattern>
 						</relocation>
+						 <relocation>
+                            <pattern>org.springframework.context</pattern>
+                            <shadedPattern>shaded.org.springframework.context</shadedPattern>
+                        </relocation>
 					</relocations>
 
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.mule.tools.devkit</groupId>
+				<artifactId>mule-devkit-maven-plugin</artifactId>
+				<version>3.9.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<!--<copyToAppsDirectory>true</copyToAppsDirectory>-->
+					<exclusions>
+						<exclusion>
+							<groupId>com.temenos.technology.integrationframework</groupId>
+							<artifactId>t24-adapter-common</artifactId>
+						</exclusion>
+					</exclusions>
 				</configuration>
 			</plugin>
             <plugin>

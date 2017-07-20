@@ -5,20 +5,22 @@ package org.mule.modules.t24inbound.automation.tests;
 import org.mule.api.ConnectionException;
 
 import com.temenos.adapter.mule.T24inbound.connector.T24InboundConnector;
+import com.temenos.adapter.mule.T24inbound.connector.config.AbstractConnectorConfig;
 import com.temenos.adapter.mule.T24inbound.connector.config.ConnectorConfig;
+import com.temenos.adapter.mule.T24inbound.connector.config.TAFJConnectorConfig;
 
 public class MetaDataExtractorTestCases {
 
 	
 	public static void main(String[] args) throws ConnectionException {
-		ConnectorConfig config = new ConnectorConfig();
-
-		config.setServiceUserName("INPUTT");
-		config.setServicePassword("123456");
-		config.testConnect("http://localhost:9089/axis2/services/IntegrationFlowServiceWS?wsdl");
+	TAFJConnectorConfig tafjConnectorConfig = new TAFJConnectorConfig();
+	tafjConnectorConfig.setServiceUserName("INPUTT");
+	tafjConnectorConfig.setServicePassword("123456");
+	tafjConnectorConfig.testConnect("INPUTT","123456");
+	tafjConnectorConfig.setServiceUrl("http://localhost:9089/axis2/services/IntegrationFlowServiceWS?wsdl");
 		
 		T24InboundConnector connector = new T24InboundConnector();
-		connector.setConfig(config);
+		
 		//List<T24Event>= connector.eventPool( null, "FinancialReporting-Category");
 		
 		System.out.println("RESULT: " + "");

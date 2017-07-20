@@ -20,7 +20,9 @@ import org.mule.common.metadata.builder.DynamicObjectBuilder;
 import org.mule.common.metadata.datatype.DataType;
 
 import com.temenos.adapter.mule.T24inbound.connector.T24InboundConnector;
-import com.temenos.adapter.mule.T24inbound.connector.config.ConnectorConfig;
+import com.temenos.adapter.mule.T24inbound.connector.config.AbstractConnectorConfig;
+import com.temenos.adapter.mule.T24inbound.connector.config.RuntimeConfigSelector;
+import com.temenos.adapter.mule.T24inbound.connector.config.TAFJConnectorConfig;
 import com.temenos.adapter.mule.T24inbound.connector.metadata.extract.T24InboundDesignTimeMetaDataExtractor;
 
 @MetaDataCategory
@@ -47,17 +49,20 @@ public class DataSenseResolver {
     	
     	/* Check the connector state */
     	if(connector != null){
-    		ConnectorConfig config = connector.getConfig();
+    		AbstractConnectorConfig config = connector.getConfig();
+
     		if(config==null ){
     			throw new ConnectionException(ConnectionExceptionCode.UNKNOWN, "301", "Connector config is unavailable!");
     		}
+			if (config.getRunTime() == RuntimeConfigSelector.TAFJ) {
+				TAFJConnectorConfig tafjConnectorConfig = (TAFJConnectorConfig) config; 
+				tafjConnectorConfig.initIntegrationServiceFlow(tafjConnectorConfig.getServiceUrl());
+				if(!config.isConnected()){
+	    			throw new ConnectionException(ConnectionExceptionCode.UNKNOWN, "302", "Connector is not connected. Can't get MetaDataKeys!");
+	    		} 
+			}
     		
-    		config.initIntegrationServiceFlow(config.getServiseURL());
     		
-    		
-    		if(!config.isConnected()){
-    			throw new ConnectionException(ConnectionExceptionCode.UNKNOWN, "302", "Connector is not connected. Can't get MetaDataKeys!");
-    		} 
     		
     		//DirectoryPickUp directoryPicker =  new DirectoryPickUp();
     		

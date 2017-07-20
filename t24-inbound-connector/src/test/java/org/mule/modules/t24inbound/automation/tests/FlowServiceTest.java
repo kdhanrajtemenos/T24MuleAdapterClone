@@ -2,17 +2,17 @@ package org.mule.modules.t24inbound.automation.tests;
 
 import org.mule.api.ConnectionException;
 
-import com.temenos.adapter.mule.T24inbound.connector.config.ConnectorConfig;
+import com.temenos.adapter.mule.T24inbound.connector.config.TAFJConnectorConfig;
 
 public class FlowServiceTest {
 	
 
 	public static void main(String[] args) throws ConnectionException {
-		ConnectorConfig cf = new ConnectorConfig();
-
+		TAFJConnectorConfig cf = new TAFJConnectorConfig();
 		cf.setServiceUserName("INPUTT");
 		cf.setServicePassword("123456");
-		cf.testConnect("http://localhost:9089/axis2/services/IntegrationFlowServiceWS?wsdl");
+		cf.testConnect("INPUTT", "INPUTT");
+		cf.setServiceUrl("http://localhost:9089/axis2/services/IntegrationFlowServiceWS?wsdl");
 	}
 
 }
