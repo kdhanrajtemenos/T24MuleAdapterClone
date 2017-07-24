@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.temenos.technology.integrationframework.adapters.mule</groupId>
-    <artifactId>t24-inbound-connector</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-    <packaging>mule-module</packaging>
-    <name>Mule T24 Inbound Anypoint Connector</name>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.temenos.technology.integrationframework.adapters.mule</groupId>
+	<artifactId>t24-inbound-connector</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>mule-module</packaging>
+	<name>Mule T24 Inbound Anypoint Connector</name>
 
-    <parent>
-        <groupId>org.mule.tools.devkit</groupId>
-        <artifactId>mule-devkit-parent</artifactId>
-        <version>3.9.0</version>
-    </parent>
+	<parent>
+		<groupId>org.mule.tools.devkit</groupId>
+		<artifactId>mule-devkit-parent</artifactId>
+		<version>3.9.0</version>
+	</parent>
 
-    <properties>
-        <category>Community</category>
-        <licensePath>LICENSE.md</licensePath>
+	<properties>
+		<category>Community</category>
+		<licensePath>LICENSE.md</licensePath>
 		<t24.version>DEV.0.0-SNAPSHOT</t24.version>
         <!-- Maven should build the update site Zip file -->
 		<devkit.studio.package.skip>false</devkit.studio.package.skip>
@@ -24,13 +25,13 @@
 		 
         <!-- Adding CXF Support -->
         
-		<!--  CXF version info -->       
+		<!--  CXF version info -->
 		<cxf.version>2.7.7</cxf.version>
 		<cxf.version.boolean>2.6.0</cxf.version.boolean>
-		 
-    </properties>
-    
-     <dependencies>
+
+	</properties>
+
+	<dependencies>
     
 		<!-- Adding CXF Support -->
 		<dependency>
@@ -40,15 +41,25 @@
 			<scope>provided</scope>
 		</dependency>
 
-		 <dependency>
-			 <groupId>org.apache.commons</groupId>
-			 <artifactId>commons-lang3</artifactId>
-			 <version>3.3.2</version>
-		 </dependency>
-
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.3.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.mulesoft.muleesb.modules</groupId>
+			<artifactId>mule-module-bti-ee</artifactId>
+			<version>${mule.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.btm</groupId>
+			<artifactId>btm</artifactId>
+			<version>2.1.4</version>
+			<scope>provided</scope>
+		</dependency>
 		<!-- TEMENOS COMMON ADDAPTER -->
-        <dependency>
-		    <groupId>com.temenos.technology.integrationframework</groupId>
+		<dependency>
+			<groupId>com.temenos.technology.integrationframework</groupId>
 			<artifactId>t24-adapter-common</artifactId>
 			<version>${t24.version}</version>
 			<exclusions>
@@ -62,7 +73,7 @@
 		
 		<!-- TEMENOS TAFJ SUPPORT -->
 		<dependency>
-		    <groupId>com.temenos.tafj</groupId>
+			<groupId>com.temenos.tafj</groupId>
 			<artifactId>tComponentFramework</artifactId>
 			<version>17.9.0</version>
 			<exclusions>
@@ -95,35 +106,35 @@
 		</dependency>
 		
 		<!-- JBOSS CLIENT -->
-		 <dependency>
-			 <groupId>org.jboss.client</groupId>
-			 <artifactId>jboss-client</artifactId>
-			 <version>7.0.0.GA-redhat-2</version>
-		 </dependency>
+		<dependency>
+			<groupId>org.jboss.client</groupId>
+			<artifactId>jboss-client</artifactId>
+			<version>7.0.0.GA-redhat-2</version>
+		</dependency>
 		
 		<!-- https://mvnrepository.com/artifact/org.glassfish.jersey.bundles.repackaged/jersey-guava-->
 		<dependency>
-		    <groupId>org.glassfish.jersey.bundles.repackaged</groupId>
-		    <artifactId>jersey-guava</artifactId>
-		    <version>2.13</version>
+			<groupId>org.glassfish.jersey.bundles.repackaged</groupId>
+			<artifactId>jersey-guava</artifactId>
+			<version>2.13</version>
 		</dependency>
 		
-		<!-- TEMENOS EJB SUPPORT  -->	  
+		<!-- TEMENOS EJB SUPPORT  -->
 		<dependency>
-		      <groupId>com.temenos.t24.external.service.if_integrationframeworkservice.tafj</groupId>
-				<artifactId>t24-IF_IntegrationFrameworkService-t24service</artifactId>
-		      <version>${t24.version}</version>
+			<groupId>com.temenos.t24.external.service.if_integrationframeworkservice.tafj</groupId>
+			<artifactId>t24-IF_IntegrationFrameworkService-t24service</artifactId>
+			<version>${t24.version}</version>
 		</dependency>
-		 <dependency>
-			 <groupId>com.temenos.t24.external.service.if_integrationframeworkservice.ejb.tafj</groupId>
-			 <artifactId>t24-IF_IntegrationFrameworkService-ejb</artifactId>
-			 <version>${t24.version}</version>
-		 </dependency>
-		 <dependency>
-			 <groupId>com.temenos.t24.external.service.if_integrationframeworkservice.data</groupId>
-			 <artifactId>t24-IF_IntegrationFrameworkService-Data</artifactId>
-			 <version>${t24.version}</version>
-		 </dependency>
+		<dependency>
+			<groupId>com.temenos.t24.external.service.if_integrationframeworkservice.ejb.tafj</groupId>
+			<artifactId>t24-IF_IntegrationFrameworkService-ejb</artifactId>
+			<version>${t24.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.temenos.t24.external.service.if_integrationframeworkservice.data</groupId>
+			<artifactId>t24-IF_IntegrationFrameworkService-Data</artifactId>
+			<version>${t24.version}</version>
+		</dependency>
 
 		 <!-- TEMENOS DATA SUPPORT -->
 
@@ -132,16 +143,16 @@
 			<artifactId>tocfT24ra</artifactId>
 			<version>${t24.version}</version>
 		</dependency>
-	 	<dependency>
+		<dependency>
 			<groupId>com.temenos.t24.external.service.if_integrationflowservice.ws.client</groupId>
 			<artifactId>t24-IF_IntegrationFlowService-IntegrationFlowServiceWS-jwc</artifactId>
 			<version>${t24.version}</version>
 		</dependency>
-		
+
 	</dependencies>
-    
-     <build>
-	    <plugins>
+
+	<build>
+		<plugins>
 	    
 			<!-- THIS PLUGIN MAKES APACHE COMMON-LANG3-3.2.2 TO WORK -->
 			<plugin>
@@ -174,55 +185,55 @@
 
 				</configuration>
 			</plugin>
-            <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.7</version>
-            <executions>
-                <execution>
-                    <phase>package</phase>
-                    <configuration>
-                        <target>
-                            <copy file="${project.build.directory}/UpdateSite.zip" tofile="${project.build.directory}/${artifactId}-site-${version}.zip" />
-                        </target>
-                    </configuration>
-                    <goals>
-                        <goal>run</goal>
-                    </goals>
-                </execution>
-            </executions>
-            </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<configuration>
+							<target>
+								<copy file="${project.build.directory}/UpdateSite.zip" tofile="${project.build.directory}/${artifactId}-site-${version}.zip" />
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
 		</plugins>
 		
 		<!-- Adding resource folder to  look for configuration files -->
-	    <resources>
-		   <resource>
-	        <directory>src/main/resources</directory>
-	        <includes>
-		          <include>**/*.prop</include>
-		          <include>**/*.properties</include>
-		          <include>**/*.xml</include>
-		          <include>**/*.wsdl</include>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<includes>
+					<include>**/*.prop</include>
+					<include>**/*.properties</include>
+					<include>**/*.xml</include>
+					<include>**/*.wsdl</include>
 		          
 		          <!-- for TESTS -->
-		          <include>**/*.cfg</include>
-		          <include>**/*.txt</include>
-		          <include>**/*.md</include>
-	        </includes>
-	      </resource>
-    	</resources>
-    </build>
-    
-    <repositories>
-        <repository>
-            <id>mulesoft-releases</id>
-            <name>MuleSoft Releases Repository</name>
-            <url>http://repository.mulesoft.org/releases/</url>
-            <layout>default</layout>
-        </repository>
-    </repositories>
-    
+					<include>**/*.cfg</include>
+					<include>**/*.txt</include>
+					<include>**/*.md</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
+
+	<repositories>
+		<repository>
+			<id>mulesoft-releases</id>
+			<name>MuleSoft Releases Repository</name>
+			<url>http://repository.mulesoft.org/releases/</url>
+			<layout>default</layout>
+		</repository>
+	</repositories>
+
 	<distributionManagement>
 		<repository>
 			<id>nexus-t24</id>
@@ -234,6 +245,6 @@
 			<name>T24 Snapshots</name>
 			<url>http://maven.temenosgroup.com/content/repositories/t24-snapshots</url>
 		</snapshotRepository>
-	</distributionManagement> 
-	
+	</distributionManagement>
+
 </project>
